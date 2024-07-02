@@ -24,11 +24,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlin.math.log
 
 
-/**
- * A simple [Fragment] subclass.
- * Use the [HomeFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding: FragmentHomeBinding get() = _binding!!
@@ -58,12 +54,11 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 
-
     private fun configureViewModel() {
         val dao = UserDatabase.getInstance(activity as Context).getUserDao()
         val fetchAllUser = FetchAllUserImpl(dao)
         val createUser = CreateUserImpl(dao)
-        viewModel = ViewModelProvider(this, HomeViewModelFactory(fetchAllUser, createUser)).get(HomeViewModel::class.java)
+        viewModel = ViewModelProvider(this, HomeViewModelFactory(fetchAllUser, createUser))[HomeViewModel::class.java]
         viewModel.listOfUser.observe(viewLifecycleOwner) {
             userListAdapter.submitList(it)
         }
@@ -121,7 +116,6 @@ class HomeFragment : Fragment() {
 
     }
 
-
     interface UserListAction {
         fun onItemClicked(pos: Int)
     }
@@ -136,7 +130,6 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_homeFragment2_to_createUserFragment)
         }
     }
-
 }
 
 

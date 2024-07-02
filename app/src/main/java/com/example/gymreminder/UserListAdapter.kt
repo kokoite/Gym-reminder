@@ -34,6 +34,7 @@ class UserListAdapter(private val userListImpl: HomeFragment.UserListAction): Re
         return userList.size
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
         holder.bind(userList[position])
     }
 
@@ -52,7 +53,7 @@ class UserListAdapter(private val userListImpl: HomeFragment.UserListAction): Re
 
         init {
 
-            itemView.setOnClickListener {
+            binding.root.setOnClickListener {
                 Log.d(TAG, ": item clicked $adapterPosition ")
                 userListImpl.onItemClicked(adapterPosition)
             }
@@ -65,7 +66,7 @@ class UserListAdapter(private val userListImpl: HomeFragment.UserListAction): Re
             joiningDate.text = convertLongToDate(userSummary.joiningDate)
         }
 
-        fun convertLongToDate(time: Long): String {
+        private fun convertLongToDate(time: Long): String {
             val instant = Instant.ofEpochMilli(time)
             val localDateTime = LocalDateTime.ofInstant(instant,ZoneId.systemDefault())
             val formatter = DateTimeFormatter.ofPattern("MMM dd yyyy")

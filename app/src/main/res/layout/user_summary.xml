@@ -3,8 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="100dp"
     android:background="@color/white"
-    android:clickable="true"
-    android:focusableInTouchMode="true"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
@@ -27,7 +25,6 @@
         app:layout_constraintBottom_toBottomOf="@id/userImage"
         android:orientation="vertical"
         android:layout_marginStart="20dp"
-
         >
         <TextView
             android:id="@+id/name"

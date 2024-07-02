@@ -30,7 +30,7 @@ import java.util.logging.Logger
 class MainActivity : AppCompatActivity() {
 
 
-    lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,57 +39,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun Todos() {
-        /*
-        * Change Joining Date and Expiry Date to long
-        * Create UIState sealed class
-        * Implement filter useCase
-        * Implement bottom sheet for choosing filters
-        * Implement Diff util with recycler view
-        * Create new Activity for new Screen
-        * Create new Activity for detail Screen
-        * Change icon for createButton
-        * Improve adapter logic
-        * Pagination in room
-        *
-        * _____________________________________________
-        * Improve loader / Progress Bar
-        *
-        * */
+
     }
 
     private fun completed() {
-        /*
-        * Change Joining Date and Expiry Date to long
-        * Create UIState sealed class
-        * Implemented filter usecase
-        * Pagination in room
-        * Fragment for new screen
-        * Fragment for detail screen
-        * Improvde adapter logic
-        * Change icon for createButton
-        * */
+
     }
 
     private fun TodoSaturday() {
-        /*
-        * Implement photo clicking and storing mechanism
-        * Hide keyboard and understand focus
-        * added minor comment
-        */
+
     }
 
     private fun TodoSunday() {
-        /*
-        * Use Fragment User as Edit User and Detail User
-        * Handle permission cases
-        * */
+
     }
 
-//    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-//        if (currentFocus != null) {
-//            Log.d(TAG, "dispatchTouchEvent: $currentFocus")
-//            hideKeyboard()
-//        }
-//        return super.dispatchTouchEvent(ev)
-//    }
 }

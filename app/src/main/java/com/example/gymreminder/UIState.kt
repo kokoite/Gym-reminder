@@ -6,7 +6,6 @@ sealed class UIState<out T> {
     data class Error(val messsage: String): UIState<Nothing>()
 }
 
-
 enum class UserActions {
     CREATE_USER,
     EDIT_USER,
