@@ -10,8 +10,8 @@ data class User(
                 val name: String,
                 val phoneNumber: String,
                 val weight: Int,
-                val joiningDate: Long,
-                val expiryDate: Long,
+                val joiningDate: String,
+                val expiryDate: String,
                 val photo: String,
                 val address: String,
                 val existingProblems: String,
@@ -24,8 +24,8 @@ data class UserSummary(
                      val userId: Long,
                      val name: String,
                      val phone: String,
-                     val joiningDate: Long,
-                     val expiryDate: Long,
+                     val joiningDate: String,
+                     val expiryDate: String,
                      val photo: String
 ) {
 
@@ -34,7 +34,7 @@ data class UserSummary(
                 name == userSummary.name &&
                 userSummary.phone == phone &&
                 userSummary.joiningDate == joiningDate &&
-                userSummary.expiryDate == expiryDate
+                userSummary.expiryDate == expiryDate &&
                 userSummary.photo == photo
     }
 }

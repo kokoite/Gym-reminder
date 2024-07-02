@@ -124,6 +124,7 @@ class HomeFragment : Fragment() {
         override fun onItemClicked(pos: Int) {
             val bundle = Bundle().apply {
                 putString("state", UserActions.VIEW_USER.toString())
+                putString("userId", (pos+1).toString())
             }
             setFragmentResult("homeFragment", bundle)
             Log.d(TAG, "onItemClicked: UserListActionImpl")

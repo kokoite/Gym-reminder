@@ -37,18 +37,18 @@ class HomeViewModel(val fetchAllUserUseCase: FetchAllUser,
         }
     }
 
-    fun createUser() {
-        val user = User(0,"pranjal", "23904309", 50, System.currentTimeMillis(), System.currentTimeMillis() + 7* milisecondInDay, "phohto", "address", "existing problems", false, "male")
-        viewModelScope.launch(Dispatchers.IO) {
-           for (i in 1..10) {
-                launch {
-                    createUserUseCase.createUser(user)
-                }
-           }
-            Log.d(TAG, "createUser: success")
-        }
-        Log.d(TAG, "createUser: After coroutine")
-    }
+//    fun createUser() {
+//        val user = User(0,"pranjal", "23904309", 50, System.currentTimeMillis(), System.currentTimeMillis() + 7* milisecondInDay, "phohto", "address", "existing problems", false, "male")
+//        viewModelScope.launch(Dispatchers.IO) {
+//           for (i in 1..10) {
+//                launch {
+//                    createUserUseCase.createUser(user)
+//                }
+//           }
+//            Log.d(TAG, "createUser: success")
+//        }
+//        Log.d(TAG, "createUser: After coroutine")
+//    }
 
     fun filterUser(filterType: UserFilter) {
 

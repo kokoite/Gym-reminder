@@ -42,6 +42,7 @@
                 />
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/userName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="John Doe"
@@ -69,6 +70,7 @@
                 android:textSize="16sp"
                 />
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/userPhone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="9182736455"
@@ -97,6 +99,7 @@
                 android:textSize="16sp"
                 />
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/userGender"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="Male"
@@ -127,6 +130,7 @@
                 />
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/userInjuries"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
@@ -157,6 +161,7 @@
                 />
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/userAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="DN Fitness, Manas Hospital"
@@ -247,11 +252,12 @@
 
                 />
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/userWeight"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="58kg"
                 android:maxLength="3"
-                android:inputType="text"
+                android:inputType="numberSigned"
                 android:maxLines="1"
                 android:paddingHorizontal="12dp"
 
@@ -278,6 +284,7 @@
 
                 />
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/paymentStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="Yes"
@@ -299,6 +306,7 @@
             android:textStyle="bold"
             android:textSize="24sp"
             android:paddingHorizontal="12dp"
+            android:visibility="invisible"
             android:text="Image not selected"
             />
         <Button

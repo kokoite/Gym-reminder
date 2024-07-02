@@ -1,5 +1,6 @@
 package com.example.gymreminder
 
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -62,15 +63,11 @@ class UserListAdapter(private val userListImpl: HomeFragment.UserListAction): Re
         fun bind(userSummary: UserSummary) {
             userName.text = userSummary.name
             phoneNumber.text = userSummary.phone
-            expiryDate.text = convertLongToDate(userSummary.expiryDate)
-            joiningDate.text = convertLongToDate(userSummary.joiningDate)
-        }
-
-        private fun convertLongToDate(time: Long): String {
-            val instant = Instant.ofEpochMilli(time)
-            val localDateTime = LocalDateTime.ofInstant(instant,ZoneId.systemDefault())
-            val formatter = DateTimeFormatter.ofPattern("MMM dd yyyy")
-            return localDateTime.format(formatter).toString()
+            expiryDate.text = userSummary.expiryDate
+            joiningDate.text = userSummary.joiningDate
+            if(userSummary.phone.isNotEmpty()) {
+                userImage.setImageURI(Uri.parse(userSummary.photo))
+            }
         }
     }
 }
