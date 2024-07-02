@@ -12,7 +12,7 @@
         android:padding="8dp"
         >
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/addPhoto"
         android:layout_width="100dp"
         android:layout_height="100dp"
@@ -20,7 +20,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="30dp"
-        android:scaleType="fitCenter"
         android:src="@drawable/create_user_icon"
         />
 
@@ -46,6 +45,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="John Doe"
+                android:inputType="text"
+                android:maxLines="1"
                 android:paddingHorizontal="12dp"
                 />
         </LinearLayout>
@@ -71,6 +72,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="9182736455"
+                android:maxLines="1"
+                android:inputType="phone"
+                android:maxLength="10"
                 android:paddingHorizontal="12dp"
                 />
         </LinearLayout>
@@ -96,6 +100,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="Male"
+                android:maxLines="1"
+                android:inputType="text"
+                android:maxLength="7"
+                android:scrollHorizontally="false"
                 android:paddingHorizontal="12dp"
                 />
         </LinearLayout>
@@ -121,7 +129,10 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
+                android:inputType="textMultiLine"
+                android:maxLines="3"
+                android:scrollHorizontally="false"
+                android:scrollbars="vertical"
                 android:hint="Fracture in left leg, Ligament problem"
                 android:paddingHorizontal="12dp"
                 />
@@ -149,7 +160,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="DN Fitness, Manas Hospital"
-
+                android:inputType="textMultiLine"
+                android:maxLines="2"
                 android:scrollHorizontally="false"
                 android:paddingHorizontal="12dp"
                 />
@@ -175,9 +187,11 @@
 
                 />
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/joiningDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="24-06-2024"
+                android:maxLines="1"
                 android:paddingHorizontal="12dp"
                 />
         </LinearLayout>
@@ -202,8 +216,12 @@
 
                 />
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/expiryDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:inputType="date"
+                android:maxLines="1"
+                android:maxLength="10"
                 android:hint="30-07-2024"
                 android:paddingHorizontal="12dp"
                 />
@@ -232,6 +250,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="58kg"
+                android:maxLength="3"
+                android:inputType="text"
+                android:maxLines="1"
                 android:paddingHorizontal="12dp"
 
                 />
@@ -260,19 +281,36 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="Yes"
+                android:inputType="text"
+                android:maxLength="3"
+                android:maxLines="1"
                 android:paddingHorizontal="12dp"
                 />
         </LinearLayout>
+        <TextView
+            android:id="@+id/errorText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/paymentLayout"
+            android:maxLines="2"
+            android:textColor="#F44336"
+            android:textStyle="bold"
+            android:textSize="24sp"
+            android:paddingHorizontal="12dp"
+            android:text="Image not selected"
+            />
         <Button
             android:id="@+id/userAction"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:text="Create Profile"
-            android:background="@color/white"
-            app:layout_constraintTop_toBottomOf="@id/weightLayout"
+            app:layout_constraintTop_toBottomOf="@id/errorText"
             android:layout_marginTop="12dp"
             app:layout_constraintStart_toStartOf="@id/weightLayout"
             app:layout_constraintEnd_toEndOf="@id/paymentLayout"
+            android:backgroundTint="@color/blue"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

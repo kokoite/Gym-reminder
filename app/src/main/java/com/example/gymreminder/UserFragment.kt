@@ -1,13 +1,16 @@
 package com.example.gymreminder
 
+import android.app.DatePickerDialog
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.clearFragmentResultListener
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
@@ -15,6 +18,9 @@ import androidx.navigation.fragment.findNavController
 import com.example.gymreminder.data.User
 import com.example.gymreminder.data.UserDatabase
 import com.example.gymreminder.databinding.FragmentUserBinding
+import com.google.android.material.textfield.TextInputEditText
+import java.util.Calendar
+import java.util.Date
 
 /**
  * A simple [Fragment] subclass.
@@ -23,11 +29,13 @@ import com.example.gymreminder.databinding.FragmentUserBinding
  */
 class UserFragment : Fragment() {
 
-    lateinit var binding: FragmentUserBinding
+    private lateinit var binding: FragmentUserBinding
     private var photoUri: Uri? = null
-    lateinit var profileImage: ImageView
+    private lateinit var profileImage: ImageView
     private var currentState: UserActions = UserActions.CREATE_USER
     private lateinit var viewModel: UserViewModel
+    private lateinit var expiryDate: TextInputEditText
+    private lateinit var joiningDate: TextInputEditText
 
     companion object {
         const val TAG = "GymApp"
@@ -43,7 +51,27 @@ class UserFragment : Fragment() {
         configureProfileButton()
         configureViewModel()
         configureCreateButton()
+        configureExpiry()
+        configureJoining()
         return binding.root
+    }
+
+    private fun configureExpiry() {
+        expiryDate = binding.expiryDate
+    }
+
+    private fun configureJoining() {
+        joiningDate = binding.joiningDate
+        joiningDate.isEnabled = false
+        joiningDate.setText(getTodayDate())
+    }
+
+    private fun getTodayDate(): String {
+        val calendar = Calendar.getInstance()
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val month = calendar.get(Calendar.MONTH)
+        val year = calendar.get(Calendar.YEAR)
+        return "$day/${month+1}/$year"
     }
 
     private fun configureViewModel() {
@@ -102,6 +130,22 @@ class UserFragment : Fragment() {
 
     private fun updateProfileImage() {
         profileImage.setImageURI(photoUri)
+    }
+
+    private fun showDatePicker() {
+        val calendar = Calendar.getInstance()
+        val datePicker = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
+            calendar.set(Calendar.DAY_OF_YEAR, dayOfMonth)
+            calendar.set(Calendar.MONTH, month)
+            calendar.set(Calendar.YEAR, year)
+            expiryDate.setText("$dayOfMonth/${month + 1}/$year")
+        }
+        val dateDialog = DatePickerDialog(requireContext(),
+            datePicker, calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_YEAR)
+        )
+        dateDialog.show()
     }
 
     override fun onDestroyView() {

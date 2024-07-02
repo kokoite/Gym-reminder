@@ -78,6 +78,7 @@ dependencies {
     val nav_version = "2.7.7"
     implementation("androidx.navigation:navigation-compose:$nav_version")
 
+    implementation ("de.hdodenhof:circleimageview:3.1.0")
     val camerax_version = "1.4.0-beta02"
     // The following line is optional, as the core library is included indirectly by camera-camera2
     implementation("androidx.camera:camera-core:${camerax_version}")
