@@ -74,6 +74,7 @@ class MainActivity : AppCompatActivity() {
         /*
         * Implement photo clicking and storing mechanism
         * Hide keyboard and understand focus
+        * added minor comment
         */
     }
 
