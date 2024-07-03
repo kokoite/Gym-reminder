@@ -1,9 +1,8 @@
-package com.example.gymreminder
+package com.example.gymreminder.ui
 
 import android.Manifest
 import android.app.AlertDialog
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri

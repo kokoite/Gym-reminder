@@ -1,13 +1,11 @@
-package com.example.gymreminder
+package com.example.gymreminder.ui
 
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResult
 
@@ -15,14 +13,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.gymreminder.HomeViewModel
+import com.example.gymreminder.HomeViewModelFactory
+import com.example.gymreminder.R
+import com.example.gymreminder.UserActions
 import com.example.gymreminder.data.TAG
 import com.example.gymreminder.data.UserDatabase
 import com.example.gymreminder.databinding.FragmentHomeBinding
+import com.example.gymreminder.utility.hideKeyboard
 import com.example.gymreminder.usecase.CreateUserImpl
 import com.example.gymreminder.usecase.FetchAllUserImpl
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlin.math.log
-
 
 
 class HomeFragment : Fragment() {
@@ -70,9 +71,6 @@ class HomeFragment : Fragment() {
         val userListImpl = UserListActionImpl()
         userListAdapter = UserListAdapter(userListImpl)
         userListRecyclerView.adapter = userListAdapter
-        userListRecyclerView.setOnClickListener {
-            hideKeyboard()
-        }
     }
 
     private fun fetchUsers() {
@@ -117,14 +115,14 @@ class HomeFragment : Fragment() {
     }
 
     interface UserListAction {
-        fun onItemClicked(pos: Int)
+        fun onItemClicked(userId: Long)
     }
 
     inner class UserListActionImpl: UserListAction {
-        override fun onItemClicked(pos: Int) {
+        override fun onItemClicked(userId: Long) {
             val bundle = Bundle().apply {
                 putString("state", UserActions.VIEW_USER.toString())
-                putString("userId", (pos+1).toString())
+                putString("userId", userId.toString())
             }
             setFragmentResult("homeFragment", bundle)
             Log.d(TAG, "onItemClicked: UserListActionImpl")

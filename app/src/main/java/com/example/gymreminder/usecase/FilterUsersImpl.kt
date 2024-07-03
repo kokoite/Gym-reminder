@@ -1,17 +1,13 @@
 package com.example.gymreminder.usecase
 
-import com.example.gymreminder.Constants
 import com.example.gymreminder.data.Subrange
-import com.example.gymreminder.data.User
 import com.example.gymreminder.data.UserDao
 import com.example.gymreminder.data.UserSummary
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.min
 
 class FilterUsersImpl(val dao: UserDao): FilterUsers {
     private var cachedUserList: List<UserSummary> = listOf()

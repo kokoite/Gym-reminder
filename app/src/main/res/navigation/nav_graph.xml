@@ -6,7 +6,7 @@
     app:startDestination="@id/homeFragment2">
     <fragment
         android:id="@+id/homeFragment2"
-        android:name="com.example.gymreminder.HomeFragment"
+        android:name="com.example.gymreminder.ui.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -15,16 +15,24 @@
     </fragment>
     <fragment
         android:id="@+id/createUserFragment"
-        android:name="com.example.gymreminder.UserFragment"
+        android:name="com.example.gymreminder.ui.UserFragment"
         android:label="fragment_create_user"
         tools:layout="@layout/fragment_user" >
         <action
             android:id="@+id/action_createUserFragment_to_cameraFragment"
             app:destination="@id/cameraFragment" />
+        <action
+            android:id="@+id/action_createUserFragment_to_previewImageFragment"
+            app:destination="@id/previewImageFragment" />
     </fragment>
     <fragment
         android:id="@+id/cameraFragment"
-        android:name="com.example.gymreminder.CameraFragment"
+        android:name="com.example.gymreminder.ui.CameraFragment"
         android:label="fragment_camera"
         tools:layout="@layout/fragment_camera" />
+    <fragment
+        android:id="@+id/previewImageFragment"
+        android:name="com.example.gymreminder.ui.PreviewImageFragment"
+        android:label="fragment_preview_image"
+        tools:layout="@layout/fragment_preview_image" />
 </navigation>

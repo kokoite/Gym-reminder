@@ -1,9 +1,7 @@
-package com.example.gymreminder
+package com.example.gymreminder.ui
 
-import android.app.DatePickerDialog
 import android.net.Uri
 import android.os.Bundle
-import android.text.Editable
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,18 +9,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.TextView
-import androidx.compose.ui.text.toLowerCase
 import androidx.fragment.app.clearFragmentResultListener
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.example.gymreminder.R
+import com.example.gymreminder.UIState
+import com.example.gymreminder.UserActions
+import com.example.gymreminder.UserViewModel
+import com.example.gymreminder.UserViewModelFactory
 import com.example.gymreminder.data.User
 import com.example.gymreminder.data.UserDatabase
 import com.example.gymreminder.databinding.FragmentUserBinding
 import com.google.android.material.textfield.TextInputEditText
 import java.util.Calendar
-import java.util.Date
 
 
 class UserFragment : Fragment() {
@@ -48,6 +49,11 @@ class UserFragment : Fragment() {
         const val TAG = "GymApp"
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate UserFragment $currentState")
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -59,7 +65,40 @@ class UserFragment : Fragment() {
         configureViewModel()
         configureProfileActionButton()
         addFragmentResultListener()
+        Log.d(TAG, "onCreateView: UserFragment $currentState")
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.d(TAG, "onViewCreated: UserFragment $currentState")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume: UserFragment $currentState")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause: UserFragment $currentState ")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop: UserFragment $currentState")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy: UserFragment $currentState")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        clearFragmentResultListener("homeFragment")
+        clearFragmentResultListener("photoUri")
+        Log.d(TAG, "onDestroyView: UserFragment $currentState")
     }
 
     private fun configureProfile() {
@@ -73,14 +112,10 @@ class UserFragment : Fragment() {
         paymentStatusView = binding.paymentStatus
     }
 
-
-
     private fun configureProfileActionButton() {
         profileActionButton = binding.userAction
         profileActionButton.setOnClickListener {
-            if(currentState == UserActions.CREATE_USER) {
-                handleCreateUser()
-            }
+            handleUserAction()
         }
     }
 
@@ -105,38 +140,45 @@ class UserFragment : Fragment() {
     private fun configureViewModel() {
         val dao = UserDatabase.getInstance(requireContext()).getUserDao()
         viewModel = ViewModelProvider(this, UserViewModelFactory(dao))[UserViewModel::class.java]
-        viewModel.createUserLiveData.observe(viewLifecycleOwner) {
-            Log.d(TAG, "configureViewModel: createdUser ${it}")
-        }
-
-        viewModel.fetchUserLiveData.observe(viewLifecycleOwner) {
-
-        }
-    }
-
-    private fun handleCreateUser() {
-        // TODO :- Use something like switch
-        if(currentState == UserActions.CREATE_USER) {
-            // TODO :- Validate in UseCases for now assuming valid data
-            val paymentStatus = paymentStatusView.text.toString().lowercase() == "yes"
-            val user = User(0, profileNameView.text.toString(), profilePhoneView.text.toString(), profileWeightView.text.toString().toInt(), joiningDate.text.toString(), expiryDate.text.toString(), photoUri?.toString() ?: "", profileAddressView.text.toString(), profileInjuryView.text.toString(), paymentStatus, profileGenderView.text.toString())
-            Log.d(TAG, "handleCreateUser: $user")
-            viewModel.createUser(user)
-        }
     }
 
 
     private fun configureProfileButton() {
-        val image = binding.addPhoto
-        image.setOnClickListener {
+        profileImage = binding.addPhoto
+        handleProfileCreateAction()
+    }
+
+    
+    private fun handleProfileCreateAction() {
+        profileImage.setOnClickListener {
             // Deleting existing photo
             photoUri?.let {
                 requireContext().contentResolver.delete(it,null)
             }
             photoUri = null
-            navigateToCamera()
+            findNavController().navigate(R.id.action_createUserFragment_to_cameraFragment)
         }
-        profileImage = image
+    }
+    
+    private fun handleProfileViewAction(photoUri: String) {
+        profileImage.setOnClickListener {
+            val bundle = Bundle().apply {
+                putString("photoUri", photoUri )
+            }
+            Log.d(TAG, "handleViewUserState: $photoUri")
+            setFragmentResult("userFragment", bundle)
+            findNavController().navigate(R.id.action_createUserFragment_to_previewImageFragment)
+        }
+    }
+    
+    private fun handleProfileUpdateAction() {
+        profileImage.setOnClickListener {
+            photoUri?.let {
+                requireContext().contentResolver.delete(it,null)
+            }
+            photoUri = null
+            findNavController().navigate(R.id.action_createUserFragment_to_cameraFragment)
+        }
     }
 
     private fun addFragmentResultListener() {
@@ -155,57 +197,16 @@ class UserFragment : Fragment() {
                 Log.d(TAG, "addFragmentResultListener:$state ")
             }
             val userId = bundle.getString("userId")
-            handleCurrentState(userId)
-
-        }
-    }
-
-    private fun handleCurrentState(userId: String?) {
-        if(currentState == UserActions.CREATE_USER) {
-            Log.d(TAG, "handleCurrentState: Create user called")
-
-        } else if(currentState == UserActions.VIEW_USER) {
-            Log.d(TAG, "handleCurrentState: called")
-            userId?.let {
-                viewModel.fetchUserDetail(userId.toInt())
+            if(this.currentState == UserActions.VIEW_USER) {
+                val id = userId?.toInt() ?: 0
+                handleViewUserState(id)
             }
-            handleViewUser()
-            Log.d(TAG, "handleCurrentState: View user called")
-
-        } else {
-            Log.d(TAG, "handleCurrentState: Update user called")
         }
     }
 
-    private fun handleViewUser() {
-        profileImage.setOnClickListener {
-            // TODO :- Open zoomed view
-        }
 
-        profileNameView.isEnabled = false
-        profileWeightView.isEnabled = false
-        profilePhoneView.isEnabled = false
-        profileAddressView.isEnabled = false
-        profileInjuryView.isEnabled = false
-        profileGenderView.isEnabled = false
-        profileActionButton.text = "Update Profile"
-        viewModel.fetchUserLiveData.observe(viewLifecycleOwner) {
-            handleUIState(it)
-            // get the state of user and update all the fields respectively
-        }
-    }
 
-    private fun handleUIState(uiState: UIState<User>) {
-        when (uiState) {
-            is  UIState.Loading ->
-                Log.d(TAG, "handleUIState: loading")
-            is  UIState.Success<User> -> updateProfile(uiState.result)
-            is UIState.Error -> Log.d(TAG, "handleUIState: Some error occured")
-        }
-    }
-
-    private fun updateProfile(user: User) {
-        Log.d(TAG, "handleUIState: user found ${user}")
+    private fun updateUiForViewState(user: User) {
         profileActionButton.text = "Update User"
         profileNameView.setText(user.name)
         profileGenderView.setText(user.gender)
@@ -217,19 +218,76 @@ class UserFragment : Fragment() {
         profileActionButton.setOnClickListener {
             Log.d(TAG, "updateProfile: profile photo clicked ")
         }
+
+        handleProfileViewAction(user.photo)
+    }
+
+    private fun updateUiForCreateState() {
+
+    }
+
+    private fun updateUiForUpdateState() {
+
+    }
+
+
+    private fun handleUIState(uiState: UIState<User>) {
+        when (uiState) {
+            is UIState.Loading ->
+                Log.d(TAG, "handleUIState: loading")
+            is UIState.Success<User> -> updateUiForViewState(uiState.result)
+            is UIState.Error -> Log.d(TAG, "handleUIState: Some error occured")
+        }
     }
 
     private fun navigateToCamera() {
-        findNavController().navigate(R.id.action_createUserFragment_to_cameraFragment)
+
     }
 
     private fun updateProfileImage() {
         profileImage.setImageURI(photoUri)
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        clearFragmentResultListener("homeFragment")
-        clearFragmentResultListener("photoUri")
+    // Mark :- User Action
+    private fun handleUserAction() {
+        when (currentState) {
+            UserActions.CREATE_USER -> handleCreateUserAction()
+            UserActions.EDIT_USER -> handleUpdateUserAction()
+            else -> {
+                Log.d(TAG, "handleUserAction: View User")
+            }
+        }
+    }
+
+    private fun handleCreateUserAction() {
+        viewModel.createUserLiveData.observe(viewLifecycleOwner) {
+
+        }
+        val paymentStatus = paymentStatusView.text.toString().lowercase() == "yes"
+        val user = User(0, profileNameView.text.toString(), profilePhoneView.text.toString(), profileWeightView.text.toString().toInt(), joiningDate.text.toString(), expiryDate.text.toString(), photoUri?.toString() ?: "", profileAddressView.text.toString(), profileInjuryView.text.toString(), paymentStatus, profileGenderView.text.toString())
+        Log.d(TAG, "handleCreateUser: $user")
+        viewModel.createUser(user)
+    }
+
+    private fun handleUpdateUserAction() {
+        viewModel.updateUserLiveData.observe(viewLifecycleOwner) {
+
+        }
+    }
+
+    private fun handleViewUserState(userId: Int) {
+        viewModel.fetchUserLiveData.observe(viewLifecycleOwner) {
+            handleUIState(it)
+        }
+        profileNameView.isEnabled = false
+        profileWeightView.isEnabled = false
+        profilePhoneView.isEnabled = false
+        profileAddressView.isEnabled = false
+        profileInjuryView.isEnabled = false
+        profileGenderView.isEnabled = false
+        expiryDate.isEnabled = false
+        paymentStatusView.isEnabled = false
+        profileActionButton.text = "Update Profile"
+        viewModel.fetchUserDetail(userId)
     }
 }

@@ -37,21 +37,13 @@ class MainActivity : AppCompatActivity() {
         binding =   ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
     }
-
-    private fun Todos() {
-
+    private fun Todo() {
+        /*
+        * Notification handling
+        * Using UIState
+        * Memory leaks
+        * Validating data before entry
+        *
+        * */
     }
-
-    private fun completed() {
-
-    }
-
-    private fun TodoSaturday() {
-
-    }
-
-    private fun TodoSunday() {
-
-    }
-
 }

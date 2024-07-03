@@ -1,4 +1,4 @@
-package com.example.gymreminder
+package com.example.gymreminder.utility
 
 import android.app.Activity
 import android.content.Context

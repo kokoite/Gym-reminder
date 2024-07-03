@@ -1,26 +1,17 @@
-package com.example.gymreminder
+package com.example.gymreminder.ui
 
 import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gymreminder.data.UserSummary
 import com.example.gymreminder.databinding.UserSummaryBinding
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import kotlin.math.log
 
 class UserListAdapter(private val userListImpl: HomeFragment.UserListAction): RecyclerView.Adapter<UserListAdapter.ViewHolder>() {
 
-    // TODO :- Implement Diff Util with recycler view
     companion object {
         private const val TAG = "GymApp"
     }
@@ -55,8 +46,7 @@ class UserListAdapter(private val userListImpl: HomeFragment.UserListAction): Re
         init {
 
             binding.root.setOnClickListener {
-                Log.d(TAG, ": item clicked $adapterPosition ")
-                userListImpl.onItemClicked(adapterPosition)
+                userListImpl.onItemClicked(userList[adapterPosition].userId)
             }
         }
 
