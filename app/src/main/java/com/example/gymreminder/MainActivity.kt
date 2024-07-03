@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         * Using UIState
         * Memory leaks
         * Validating data before entry
-        *
-        * */
+        * Error handling with coroutines
+        */
     }
 }

@@ -48,8 +48,8 @@ enum class Gender(val description: String) {
 
 
 sealed class UserFilter {
-    class ExpireFilter(days: Int): UserFilter()
-    class NameFilter(name: String): UserFilter()
+    class ExpireFilter(val days: Int): UserFilter()
+    class NameFilter(val name: String): UserFilter()
 }
 
 

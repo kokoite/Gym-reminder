@@ -19,11 +19,15 @@ import com.example.gymreminder.R
 import com.example.gymreminder.UserActions
 import com.example.gymreminder.data.TAG
 import com.example.gymreminder.data.UserDatabase
+import com.example.gymreminder.data.UserFilter
 import com.example.gymreminder.databinding.FragmentHomeBinding
 import com.example.gymreminder.utility.hideKeyboard
 import com.example.gymreminder.usecase.CreateUserImpl
 import com.example.gymreminder.usecase.FetchAllUserImpl
+import com.example.gymreminder.usecase.FilterUsers
+import com.example.gymreminder.usecase.FilterUsersImpl
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.delay
 
 
 class HomeFragment : Fragment() {
@@ -34,6 +38,8 @@ class HomeFragment : Fragment() {
     private lateinit var userListRecyclerView: RecyclerView
     private lateinit var createButton: FloatingActionButton
     private lateinit var viewModel: HomeViewModel
+    private lateinit var dialog: BottomSheetDialog
+
 
 
     override fun onCreateView(
@@ -47,6 +53,7 @@ class HomeFragment : Fragment() {
         configureRecyclerView()
         configureCreateUserButton()
         fetchUsers()
+        showBottomSheet()
         return binding.root
     }
 
@@ -58,8 +65,8 @@ class HomeFragment : Fragment() {
     private fun configureViewModel() {
         val dao = UserDatabase.getInstance(activity as Context).getUserDao()
         val fetchAllUser = FetchAllUserImpl(dao)
-        val createUser = CreateUserImpl(dao)
-        viewModel = ViewModelProvider(this, HomeViewModelFactory(fetchAllUser, createUser))[HomeViewModel::class.java]
+        val filterUser = FilterUsersImpl(dao)
+        viewModel = ViewModelProvider(this, HomeViewModelFactory(fetchAllUser, filterUser))[HomeViewModel::class.java]
         viewModel.listOfUser.observe(viewLifecycleOwner) {
             userListAdapter.submitList(it)
         }
@@ -88,7 +95,6 @@ class HomeFragment : Fragment() {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 newText?.let {
-                    handleQueryTextChange(it)
                 }
                 return true
             }
@@ -107,11 +113,45 @@ class HomeFragment : Fragment() {
     }
 
     private fun handleQuerySubmit(text: String) {
-
+        viewModel.filterUser(UserFilter.NameFilter(text))
     }
 
     private fun handleQueryTextChange(text: String) {
+        Log.d(TAG, "handleQueryTextChange: text change $text")
+    }
 
+    private fun showBottomSheet() {
+        val buttonActions = getButtonAction()
+        dialog = BottomSheetDialog(buttonActions)
+        dialog.show(childFragmentManager, "gymApp")
+    }
+
+    private fun getButtonAction() : Array<BottomSheetDialog.BottomSheetButton> {
+
+        val button1 = createBottomSheetButton(7)
+        val button2 = createBottomSheetButton(15)
+        val button3 = createBottomSheetButton(30)
+        val button4 = object: BottomSheetDialog.BottomSheetButton {
+            override val title: String
+                get() = "Clear all filters"
+
+            override fun execute() {
+                viewModel.clearAllFilter()
+                dialog.dismiss()
+            }
+        }
+
+        return listOf(button1, button2, button3, button4).toTypedArray()
+    }
+
+    private fun createBottomSheetButton(days: Int) = object : BottomSheetDialog.BottomSheetButton {
+        override val title: String
+            get() = "Expiry in $days days"
+
+        override fun execute() {
+            viewModel.filterUser(UserFilter.ExpireFilter(days))
+            dialog.dismiss()
+        }
     }
 
     interface UserListAction {
@@ -130,6 +170,3 @@ class HomeFragment : Fragment() {
         }
     }
 }
-
-
-

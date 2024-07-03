@@ -261,12 +261,12 @@ class UserFragment : Fragment() {
 
     private fun handleCreateUserAction() {
         viewModel.createUserLiveData.observe(viewLifecycleOwner) {
-
+                findNavController().popBackStack()
         }
         val paymentStatus = paymentStatusView.text.toString().lowercase() == "yes"
         val user = User(0, profileNameView.text.toString(), profilePhoneView.text.toString(), profileWeightView.text.toString().toInt(), joiningDate.text.toString(), expiryDate.text.toString(), photoUri?.toString() ?: "", profileAddressView.text.toString(), profileInjuryView.text.toString(), paymentStatus, profileGenderView.text.toString())
         Log.d(TAG, "handleCreateUser: $user")
-        viewModel.createUser(user)
+        viewModel.createMultipleUser(user)
     }
 
     private fun handleUpdateUserAction() {

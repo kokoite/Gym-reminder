@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bottom_sheet_background"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/expiryLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        >
+        <Button
+            android:id="@+id/expiry7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Expiry in 7 days"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:backgroundTint="@color/black"
+            />
+
+        <View
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            />
+
+        <Button
+            android:id="@+id/expiry15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Expiry in 15 days"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toEndOf="@id/expiry7"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:backgroundTint="@color/black"
+            />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/expiry30"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Expiry in 30 days"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf ="@id/expiryLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/black"
+        />
+
+    <Button
+        android:id="@+id/clearFilter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear filter"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/expiry30"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/black"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

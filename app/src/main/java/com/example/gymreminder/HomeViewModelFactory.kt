@@ -5,9 +5,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.gymreminder.data.UserDao
 import com.example.gymreminder.usecase.CreateUser
 import com.example.gymreminder.usecase.FetchAllUser
+import com.example.gymreminder.usecase.FilterUsers
 
-class HomeViewModelFactory(val fetchUser: FetchAllUser, val createUser: CreateUser): ViewModelProvider.Factory {
+class HomeViewModelFactory(val fetchUser: FetchAllUser , val filterUser: FilterUsers): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return HomeViewModel(fetchUser, createUser) as T
+        return HomeViewModel(fetchUser, filterUser) as T
     }
 }
