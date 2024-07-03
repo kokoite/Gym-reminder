@@ -59,5 +59,4 @@ class BottomSheetDialog(private val buttons: Array<BottomSheetButton>): BottomSh
         val title: String
         fun execute()
     }
-
 }

@@ -53,7 +53,6 @@ class HomeFragment : Fragment() {
         configureRecyclerView()
         configureCreateUserButton()
         fetchUsers()
-        showBottomSheet()
         return binding.root
     }
 

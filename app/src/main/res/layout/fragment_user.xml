@@ -309,16 +309,48 @@
             android:visibility="invisible"
             android:text="Image not selected"
             />
-        <Button
-            android:id="@+id/userAction"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:text="Create Profile"
+
+        <LinearLayout
+            android:id="@+id/userActionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/errorText"
-            android:layout_marginTop="12dp"
-            app:layout_constraintStart_toStartOf="@id/weightLayout"
-            app:layout_constraintEnd_toEndOf="@id/paymentLayout"
-            android:backgroundTint="@color/blue"
-            />
+            android:gravity="center"
+            >
+
+            <Button
+                android:id="@+id/createupdateUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Update Profile"
+                app:layout_constraintTop_toBottomOf="@id/errorText"
+                app:layout_constraintStart_toStartOf="@id/weightLayout"
+                android:backgroundTint="@color/blue"
+                android:layout_gravity="center"
+                />
+
+            <View
+                android:id="@+id/userActionSeparatorView"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                />
+
+            <Button
+                android:id="@+id/deleteUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete Profile"
+                app:layout_constraintTop_toBottomOf="@id/errorText"
+                app:layout_constraintStart_toStartOf="@id/weightLayout"
+                android:backgroundTint="@color/blue"
+                android:visibility="gone"
+                android:layout_gravity="center"
+                />
+        </LinearLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

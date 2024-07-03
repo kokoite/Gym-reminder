@@ -52,7 +52,6 @@ class UserViewModel(private val dao: UserDao) : ViewModel() {
     }
 
     fun createUser(user: User) {
-        Log.d(TAG, "createUser: Called")
         createUserJob?.cancel()
         _createUserLiveData.value = UIState.Loading
         createUserJob = viewModelScope.launch {
@@ -69,9 +68,7 @@ class UserViewModel(private val dao: UserDao) : ViewModel() {
     }
 
     fun fetchUserDetail(userId: Int) {
-        fetchUserJob?.let {
-            it.cancel()
-        }
+        fetchUserJob?.cancel()
         _fetchUserLiveData.value = UIState.Loading
         fetchUserJob = viewModelScope.launch {
             try {
@@ -85,9 +82,7 @@ class UserViewModel(private val dao: UserDao) : ViewModel() {
     }
 
     fun updateUserDetail(user: User) {
-        updateUserJob?.let {
-            it.cancel()
-        }
+        updateUserJob?.cancel()
         _updateUserLiveData.value = UIState.Loading
         updateUserJob = viewModelScope.launch {
             try {
@@ -101,9 +96,7 @@ class UserViewModel(private val dao: UserDao) : ViewModel() {
     }
 
     fun deleteUser(user: User) {
-        deleteUserJob?.let {
-            it.cancel()
-        }
+        deleteUserJob?.cancel()
         _deleteUserLiveData.value = UIState.Loading
         deleteUserJob = viewModelScope.launch {
             try {

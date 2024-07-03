@@ -71,7 +71,8 @@ class HomeViewModel(private val fetchAllUserUseCase: FetchAllUser,
         }
     }
 
+
     fun clearAllFilter() {
-        // TODO -: Show unfiltered cached response
+
     }
 }
