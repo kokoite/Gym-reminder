@@ -42,11 +42,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun Todo() {
         /*
-        * Notification handling
-        * Using UIState
-        * Memory leaks
-        * Validating data before entry
-        * Error handling with coroutines
+        *
+        *
         */
     }
 }

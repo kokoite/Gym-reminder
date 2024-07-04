@@ -1,9 +1,16 @@
 package com.example.gymreminder.ui
 
+import android.Manifest
+import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.PorterDuff
 import android.media.Image
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.ContextMenu
 import androidx.fragment.app.Fragment
@@ -15,6 +22,9 @@ import android.view.View.OnScrollChangeListener
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.registerForActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -28,6 +38,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gymreminder.HomeViewModel
 import com.example.gymreminder.HomeViewModelFactory
+import com.example.gymreminder.NotificationService
 import com.example.gymreminder.R
 import com.example.gymreminder.UserActions
 import com.example.gymreminder.data.TAG
@@ -60,6 +71,17 @@ class HomeFragment : Fragment() {
     private lateinit var closeButton: ImageView
     private lateinit var searchButton: ImageView
     private lateinit var filterButton: ImageView
+    private var navigatingFromSettings = false
+
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {result ->
+        if(result) {
+            Log.d(TAG, "Permssion granted for post notification ")
+        } else {
+            // show Denied permission dialog
+            showPermissionDeniedDialog()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -71,6 +93,9 @@ class HomeFragment : Fragment() {
         configureRecyclerView()
         configureCreateUserButton()
         fetchUsers()
+        requestPermission()
+        val notificationService = NotificationService(requireContext().applicationContext)
+        notificationService.showNotification(20)
         return binding.root
     }
 
@@ -78,7 +103,64 @@ class HomeFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-    
+
+
+    private fun requestPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return
+        }
+        if(!checkPermission()) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                val shouldShow = shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
+                if(shouldShow) {
+                    showRationaleDialog()
+                }
+        } else {
+            Log.d(TAG, "Post notification permission already granted")
+        }
+    }
+
+    private fun checkPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun showRationaleDialog() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return
+        }
+        AlertDialog.Builder(requireContext())
+            .setTitle("Notification permission needed")
+            .setMessage("Notification permission is needed in order to send notification")
+            .setPositiveButton("Okay") { dialog, _ ->
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+
+                dialog.cancel()
+            }
+            .setNegativeButton("Cancel") {_,_ ->
+                findNavController().popBackStack()
+            }.create()
+            .show()
+    }
+
+    private fun showPermissionDeniedDialog() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return
+        }
+        AlertDialog.Builder(requireContext())
+            .setTitle("Permission denied")
+            .setMessage("Notification permission denied. You can enable it in app settings")
+            .setPositiveButton("Settings") {dialog, _ ->
+                val intent  = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", requireContext().packageName, null)
+                }
+
+                startActivity(intent)
+                navigatingFromSettings = true
+                dialog.cancel()
+            }.setNegativeButton("Cancel") {_,_ ->
+                findNavController().popBackStack()
+            }.create().show()
+    }
 
     private fun configureViewModel() {
         val dao = UserDatabase.getInstance(activity as Context).getUserDao()
