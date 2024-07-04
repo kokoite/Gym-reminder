@@ -94,6 +94,7 @@ class HomeFragment : Fragment() {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 newText?.let {
+                    handleQueryTextChange(it)
                 }
                 return true
             }
@@ -116,7 +117,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun handleQueryTextChange(text: String) {
-        Log.d(TAG, "handleQueryTextChange: text change $text")
+        viewModel.filterUser(UserFilter.NameFilter(text))
     }
 
     private fun showBottomSheet() {

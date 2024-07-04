@@ -176,6 +176,10 @@ class UserFragment : Fragment() {
         }
 
         profileImage.setOnClickListener {
+            val bundle = Bundle().apply {
+                putString("photoUri", photoUri?.toString())
+            }
+            setFragmentResult("userFragment", bundle)
             findNavController().navigate(R.id.action_createUserFragment_to_previewImageFragment)
         }
 
@@ -271,14 +275,5 @@ class UserFragment : Fragment() {
 
     private fun handleError() {
 
-    }
-
-
-    // Life cycle methods
-    override fun onDestroyView() {
-        super.onDestroyView()
-        clearFragmentResultListener("homeFragment")
-        clearFragmentResultListener("photoUri")
-        Log.d(TAG, "onDestroyView: UserFragment $currentState")
     }
 }

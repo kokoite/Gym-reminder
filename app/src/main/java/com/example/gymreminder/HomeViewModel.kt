@@ -18,6 +18,7 @@ import com.example.gymreminder.usecase.FilterUsers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Date
@@ -51,8 +52,11 @@ class HomeViewModel(private val fetchAllUserUseCase: FetchAllUser,
         filterName?.cancel()
         filterName = viewModelScope.launch {
            try {
-               val users = filterUserUseCase.filterUserBasedOn(name)
-               _mutableListOfUser.postValue(users)
+               delay(300)
+               if(filterName?.isActive == true) {
+                   val users = filterUserUseCase.filterUserBasedOn(name)
+                   _mutableListOfUser.postValue(users)
+               }
            } catch (error: Error) {
                Log.d(TAG, "handleNameFiltering: Something went wrong")
            }
