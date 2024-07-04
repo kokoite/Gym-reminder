@@ -57,7 +57,7 @@ class FilterUsersImpl(val dao: UserDao): FilterUsers {
                         users.filter {
                             val expiryTime = convertToStringToMillis(it.expiryDate)
                             val currentTime = System.currentTimeMillis()
-                            (expiryTime <= currentTime + expiryDays *  milisecondInDay)
+                            (expiryTime <= currentTime + ((expiryDays+1) *  milisecondInDay))
 
                         }.map {
                             UserSummary(it.userId,it.name, it.phoneNumber, it.joiningDate, it.expiryDate, it.photo)
@@ -90,7 +90,7 @@ class FilterUsersImpl(val dao: UserDao): FilterUsers {
     }
 
     private fun convertToStringToMillis(curDate: String): Long {
-        val dateFormat = SimpleDateFormat("yyyy-mm-dd", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("d-MM-yyyy", Locale.getDefault())
         var timeInMilis: Long = 0
         try {
             timeInMilis = dateFormat.parse(curDate)?.time ?: throw IllegalArgumentException("Invalid format")

@@ -51,17 +51,11 @@ class UserFragment : Fragment() {
     private lateinit var deleteButton: Button
     private lateinit var separatorView: View
 
-
     companion object {
         const val TAG = "GymApp"
     }
 
     // MARK :- Lifecycle methods
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d(TAG, "onCreate UserFragment $currentState")
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -71,6 +65,7 @@ class UserFragment : Fragment() {
         setupProfile()
         setupViewModel()
         addFragmentResultListener()
+        configureCurrentState()
         return binding.root
     }
 
@@ -137,7 +132,7 @@ class UserFragment : Fragment() {
         }
         profileActionButton.setOnClickListener {
             val user = createUserFromField()
-            viewModel.createUser(user)
+            viewModel.createMultipleUser(user)
         }
 
         profileImage.setOnClickListener {

@@ -62,7 +62,7 @@ import kotlin.math.abs
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding: FragmentHomeBinding get() = _binding!!
-    private lateinit var searchView: EditText
+    private lateinit var searchView: androidx.appcompat.widget.SearchView
     private lateinit var  userListAdapter: UserListAdapter
     private lateinit var userListRecyclerView: RecyclerView
     private lateinit var createButton: FloatingActionButton
@@ -94,6 +94,7 @@ class HomeFragment : Fragment() {
         configureCreateUserButton()
         fetchUsers()
         requestPermission()
+        showBottomSheet()
         val notificationService = NotificationService(requireContext().applicationContext)
         notificationService.showNotification(20)
         return binding.root
@@ -185,50 +186,22 @@ class HomeFragment : Fragment() {
     }
 
     private fun configureSearchView() {
-        searchView = binding.searchView
-        closeButton = binding.closeIcon
-        filterButton = binding.filterIcon
-        searchButton = binding.searchIcon
-        searchView.addTextChangedListener { text ->
-            if(text?.isNotEmpty() == true) {
-                closeButton.visibility = View.VISIBLE
-                closeButton.setBackgroundTint(R.color.black)
-                searchButton.setBackgroundTint(R.color.black)
-                filterButton.setBackgroundTint(R.color.black)
-                if(text.toString().last() == '\n') {
-                    viewModel.filterUser(UserFilter.NameFilter(text.toString()))
-                    val txt = text.toString().filter {
-                        it != '\n'
-                    }
-                    searchView.setText(txt)
-                    searchView.clearFocus()
-                } else {
-                    viewModel.filterUser(UserFilter.NameFilter(text.toString()))
+        searchView = binding.searchField
+        searchView.isFocusedByDefault = false
+        searchView.setOnQueryTextListener(object: androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                hideKeyboard()
+                viewModel.filterUser(UserFilter.NameFilter(query ?: ""))
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let {
+                    viewModel.filterUser(UserFilter.NameFilter(it))
                 }
-            } else {
-                closeButton.visibility = View.INVISIBLE
+                return true
             }
-
-            closeButton.setOnClickListener {
-                searchView.setText("")
-                it.visibility = View.GONE
-                searchButton.setBackgroundTint(R.color.lightGray)
-                filterButton.setBackgroundTint(R.color.lightGray)
-                closeButton.setBackgroundTint(R.color.lightGray)
-            }
-        }
-
-
-        filterButton.setOnClickListener {
-            showBottomSheet()
-        }
-
-        searchButton.setOnClickListener {
-            val text = searchView.text.toString()
-            if(text.length > 1) {
-                viewModel.filterUser(UserFilter.NameFilter(text))
-            }
-        }
+        })
     }
 
     private fun configureCreateUserButton() {
