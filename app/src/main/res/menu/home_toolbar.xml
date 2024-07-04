@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+        android:title="Search users"
+        android:id="@+id/searchIcon"
+        android:icon="@drawable/search_icon"
+        app:showAsAction="ifRoom|collapseActionView"
+        android:visible="true"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        />
+
+    <item
+        android:id="@+id/filter_icon"
+        android:title="Filter"
+        app:showAsAction="ifRoom|collapseActionView"
+        android:icon="@drawable/filter_list"
+        android:visible="false"
+        />
+
+    <item
+        android:title="Item 1"
+        android:id="@+id/newGroup"
+        />
+
+    <item
+        android:title="Item 2"
+        android:id="@+id/oldGroup"
+        />
+
+    <item
+        android:title="Item 3"
+        android:id="@+id/midGroup"
+        />
+</menu>

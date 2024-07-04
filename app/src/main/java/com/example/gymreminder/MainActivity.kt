@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnClickListener
@@ -36,7 +37,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding =   ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
     }
+
     private fun Todo() {
         /*
         * Notification handling

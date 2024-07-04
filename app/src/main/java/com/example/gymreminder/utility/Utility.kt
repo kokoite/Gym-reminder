@@ -2,8 +2,11 @@ package com.example.gymreminder.utility
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.PorterDuff
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import java.util.Calendar
 
@@ -27,4 +30,11 @@ fun getTodayDate(): String {
     val month = calendar.get(Calendar.MONTH)
     val year = calendar.get(Calendar.YEAR)
     return "$day-${month+1}-$year"
+}
+
+fun ImageView.setBackgroundTint(id: Int) {
+    setColorFilter(
+        ContextCompat.getColor(context, id),  // Get color from resource
+        PorterDuff.Mode.MULTIPLY  // Apply the tint by multiplying with the original image colors
+    )
 }

@@ -2,7 +2,8 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.GymReminder" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-<!--         <item name="colorPrimary">@color/cream</item>-->
+         <item name="colorPrimary">@color/lavender</item>
+        <item name="colorPrimaryDark">@color/lavender</item>
     </style>
 
     <style name="Theme.GymReminder" parent="Base.Theme.GymReminder" />

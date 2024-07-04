@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
@@ -23,6 +24,7 @@ import com.example.gymreminder.data.User
 import com.example.gymreminder.data.UserDatabase
 import com.example.gymreminder.databinding.FragmentUserBinding
 import com.example.gymreminder.utility.getTodayDate
+import com.example.gymreminder.utility.hideKeyboard
 import com.google.android.material.textfield.TextInputEditText
 import java.lang.IllegalArgumentException
 import java.util.Calendar
