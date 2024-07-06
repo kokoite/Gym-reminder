@@ -17,9 +17,9 @@ data class User(
                 val existingProblems: String,
                 val paymentDone: Boolean,
                 val gender: String,
-                val amount: Int
+                val amount: Int,
+                val isActive: Boolean
 )
-
 
 data class UserSummary(
                      val userId: Long,

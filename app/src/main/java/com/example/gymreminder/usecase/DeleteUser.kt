@@ -1,5 +1,5 @@
 package com.example.gymreminder.usecase
 
 interface DeleteUser {
-    fun delete(userId: String)
+    suspend fun delete(userId: String)
 }

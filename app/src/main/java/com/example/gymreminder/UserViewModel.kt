@@ -7,6 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymreminder.data.User
 import com.example.gymreminder.data.UserDao
+import com.example.gymreminder.repository.UserRepository
+import com.example.gymreminder.usecase.CreateUser
+import com.example.gymreminder.usecase.DeleteUser
+import com.example.gymreminder.usecase.EditUser
+import com.example.gymreminder.usecase.FetchUser
 import com.example.gymreminder.utility.convertToStringToMillis
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +20,11 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class UserViewModel(private val dao: UserDao) : ViewModel() {
+class UserViewModel(private val createUser: CreateUser,
+                    private val updateUser: EditUser,
+                    private val deleteUser: DeleteUser,
+                    private val fetchUser: FetchUser
+    ) : ViewModel() {
 
     val createUserLiveData: LiveData<UIState<Boolean>> get() = _createUserLiveData
     val fetchUserLiveData: LiveData<UIState<User>> get() = _fetchUserLiveData
@@ -43,7 +52,7 @@ class UserViewModel(private val dao: UserDao) : ViewModel() {
                 repeat(20) {
                     launch {
                         try {
-                            dao.createUser(user)
+                            createUser.createUser(user)
                             Log.d(TAG, "createUser: success")
                         } catch (error: Error) {
                             Log.d(TAG, "createUser: Failed")
@@ -64,24 +73,22 @@ class UserViewModel(private val dao: UserDao) : ViewModel() {
         _createUserLiveData.value = UIState.Loading
         createUserJob = viewModelScope.launch {
             try {
-                dao.createUser(user)
-                Log.d(TAG, "createUser: success")
+                createUser.createUser(user)
                 _createUserLiveData.value = UIState.Success<Boolean>(true)
             } catch (error: Error) {
-                Log.d(TAG, "createUser: Failed")
                 _createUserLiveData.value =
                     UIState.Error("Something went wrong. Unable to create user")
             }
         }
     }
 
-    fun fetchUserDetail(userId: Int) {
+    fun fetchUserDetail(userId: String) {
         fetchUserJob?.cancel()
         _fetchUserLiveData.value = UIState.Loading
         fetchUserJob = viewModelScope.launch {
             try {
-                val user = dao.getUser(userId)
-                _fetchUserLiveData.value = UIState.Success<User>(user.first())
+                val user = fetchUser.fetchDetail(userId)
+                _fetchUserLiveData.value = UIState.Success<User>(user)
             } catch (error: Error) {
                 _fetchUserLiveData.value =
                     UIState.Error("Something went wrong. Unable to fetch user")
@@ -98,7 +105,7 @@ class UserViewModel(private val dao: UserDao) : ViewModel() {
         _updateUserLiveData.value = UIState.Loading
         updateUserJob = viewModelScope.launch {
             try {
-                dao.updateUser(user)
+                updateUser.updateUser(user)
                 _updateUserLiveData.value = UIState.Success(user)
             } catch (error: Error) {
                 _updateUserLiveData.value =
@@ -107,12 +114,12 @@ class UserViewModel(private val dao: UserDao) : ViewModel() {
         }
     }
 
-    fun deleteUser(user: User) {
+    fun deleteUser(userId: String) {
         deleteUserJob?.cancel()
         _deleteUserLiveData.value = UIState.Loading
         deleteUserJob = viewModelScope.launch {
             try {
-                dao.deleteUser(user)
+                deleteUser.delete(userId)
                 _deleteUserLiveData.value = UIState.Success(false)
             } catch (error: Error) {
                 _deleteUserLiveData.value =

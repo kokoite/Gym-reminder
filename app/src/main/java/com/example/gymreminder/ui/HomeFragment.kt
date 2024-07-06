@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gymreminder.HomeViewModel
 import com.example.gymreminder.HomeViewModelFactory
+import com.example.gymreminder.MyApplication
 import com.example.gymreminder.NotificationService
 import com.example.gymreminder.R
 import com.example.gymreminder.UserActions
@@ -165,10 +166,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun configureViewModel() {
-        val dao = UserDatabase.getInstance(activity as Context).getUserDao()
-        val fetchAllUser = FetchAllUserImpl(dao)
-        val filterUser = FilterUsersImpl(dao)
-        viewModel = ViewModelProvider(this, HomeViewModelFactory(fetchAllUser, filterUser))[HomeViewModel::class.java]
+        val app = requireActivity().application as MyApplication
+        viewModel = ViewModelProvider(this, HomeViewModelFactory(app.fetchUsers, app.filterUser))[HomeViewModel::class.java]
         viewModel.listOfUser.observe(viewLifecycleOwner) {
             userListAdapter.submitList(it)
         }

@@ -5,6 +5,5 @@ import com.example.gymreminder.data.UserSummary
 
 interface FetchAllUser {
     suspend fun fetchAll(): List<UserSummary>
-    suspend fun filterUserBasisOnExpiry(day: Int): List<UserSummary>
-    suspend fun filterUserBasisOnName(name: String): List<UserSummary>
+    suspend fun fetchMoreUsers(): List<UserSummary>
 }

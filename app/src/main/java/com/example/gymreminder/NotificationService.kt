@@ -17,7 +17,8 @@ class NotificationService(private val context: Context) {
     companion object {
         const val CHANNEL_ID = "user_expiry_notification"
         const val CHANNEL_NAME = "User Expiry"
-        const val REQUEST_CODE_PENDING_INTENT = 10
+        const val PLAN_EXPIRY_REQUEST_CODE = 10
+        const val PAYMENT_PENDING_REQUEST_CODE = 20
     }
 
     fun createAndVerifyChannel() {
@@ -30,18 +31,30 @@ class NotificationService(private val context: Context) {
             channel.description = "Notification contains information about user expiry dates"
             notificationManager.createNotificationChannel(channel)
         }
-
     }
 
-    fun showNotification(counter: Int) {
+
+    fun showPlanExpiryNotification(count: Int) {
         val intent = Intent(context, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(context, REQUEST_CODE_PENDING_INTENT, intent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getActivity(context, PLAN_EXPIRY_REQUEST_CODE, intent, PendingIntent.FLAG_IMMUTABLE)
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle("Plan expiry")
-            .setContentText("$counter - users plan pending for renewal this week")
+            .setContentText("$count - users plan pending for renewal this week")
             .setContentIntent(pendingIntent)
             .setSmallIcon(R.drawable.dumbbell)
             .build()
         notificationManager.notify(1, notification)
+    }
+
+    fun showActiveButExpiryPassedNotification(count: Int) {
+        val intent = Intent(context, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(context, PAYMENT_PENDING_REQUEST_CODE, intent, PendingIntent.FLAG_IMMUTABLE)
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.dumbbell)
+            .setContentTitle("Payment Pending")
+            .setContentText("Payment remaining for $count users")
+            .setContentIntent(pendingIntent)
+            .build()
+        notificationManager.notify(2, notification)
     }
 }

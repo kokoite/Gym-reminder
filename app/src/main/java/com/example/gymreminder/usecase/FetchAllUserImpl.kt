@@ -4,19 +4,23 @@ import com.example.gymreminder.data.User
 import com.example.gymreminder.data.UserDao
 import com.example.gymreminder.data.UserFilter
 import com.example.gymreminder.data.UserSummary
+import com.example.gymreminder.repository.UserRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
-class FetchAllUserImpl(private val dao: UserDao): FetchAllUser {
+class FetchAllUserImpl(private val repository: UserRepository): FetchAllUser {
 
-    var response: List<UserSummary>? = null
+    private var response: List<UserSummary>? = null
 
     override suspend fun fetchAll(): List<UserSummary> {
+        response?.let {
+            return it
+        }
         var userSummary = listOf<UserSummary>()
         coroutineScope {
             val users = async {
-                dao.getAllUsers()
+                repository.fetchAllUsersLocally()
             }.await()
             userSummary = users.map {
                 UserSummary(
@@ -34,32 +38,8 @@ class FetchAllUserImpl(private val dao: UserDao): FetchAllUser {
         return userSummary
     }
 
-    override suspend fun filterUserBasisOnExpiry(day: Int): List<UserSummary> {
-        var filterList: List<UserSummary> = listOf()
-        coroutineScope {
-            if(response == null) {
-                launch {
-                    fetchAll()
-                }.join()
-            }
-            response?.let {
-                filterList = it
-            }
-        }
-
-        return filterList
+    override suspend fun fetchMoreUsers(): List<UserSummary> {
+        // TODO :- Using pagination here
+        return listOf()
     }
-
-    override suspend fun filterUserBasisOnName(name: String): List<UserSummary> {
-        var filterList: List<UserSummary> = listOf()
-        coroutineScope {
-            if(response == null) {
-
-            }
-        }
-
-        return filterList
-    }
-
-
 }

@@ -1,18 +1,26 @@
 package com.example.gymreminder.repository
 
+import com.example.gymreminder.data.User
+
 interface UserRepository {
 
-    fun fetchAllUsersLocally()
-
+    suspend fun fetchAllUsersLocally(): List<User>
     fun fetchAllUsersRemotely()
 
-    fun fetchUserLocally()
+    suspend fun fetchUserLocally(userId: String): User
     fun fetchUserRemotely()
 
-    fun editUserLocally()
+    suspend fun editUserLocally(user: User)
     fun editUserRemotely()
 
-    fun deleteUserLocally()
+    suspend fun deleteUserLocally(userId: String)
     fun deleteUserRemotely()
+
+    suspend fun createUserLocally(user: User)
+    fun createUserRemotely()
+
+    suspend fun fetchPaginatedUsersLocally(pageSize: Int, offset: Int): List<User>
+
+    suspend fun getAllUserCountLocally(): Int
 
 }

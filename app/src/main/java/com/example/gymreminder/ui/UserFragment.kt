@@ -21,6 +21,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.example.gymreminder.MyApplication
 import com.example.gymreminder.R
 import com.example.gymreminder.UIState
 import com.example.gymreminder.UserActions
@@ -29,6 +30,7 @@ import com.example.gymreminder.UserViewModelFactory
 import com.example.gymreminder.data.User
 import com.example.gymreminder.data.UserDatabase
 import com.example.gymreminder.databinding.FragmentUserBinding
+import com.example.gymreminder.usecase.FetchUsersImpl
 import com.example.gymreminder.utility.getTodayDate
 import com.example.gymreminder.utility.hideKeyboard
 import com.google.android.material.textfield.TextInputEditText
@@ -127,12 +129,12 @@ class UserFragment : Fragment() {
     }
 
     private fun setupViewModel() {
-        val dao = UserDatabase.getInstance(requireContext()).getUserDao()
-        viewModel = ViewModelProvider(this, UserViewModelFactory(dao))[UserViewModel::class.java]
+        val app = requireActivity().application as MyApplication
+        viewModel = ViewModelProvider(this, UserViewModelFactory(app.fetchUser, app.updateUser, app.createUser, app.deleteUser))[UserViewModel::class.java]
     }
 
     private fun addFragmentResultListener() {
-        setFragmentResultListener("cameraFragment") { requestKey, bundle ->
+        setFragmentResultListener("cameraFragment") { _, bundle ->
             val photoUriString = bundle.getString("photoUri")
             if(photoUriString?.isNotEmpty() == true) {
                 val photoUri = Uri.parse(photoUriString)
@@ -141,7 +143,7 @@ class UserFragment : Fragment() {
             }
         }
 
-        setFragmentResultListener("homeFragment") { requestKey, bundle ->
+        setFragmentResultListener("homeFragment") { _, bundle ->
             val currentState = bundle.getString("state") ?: ""
             val userId = bundle.getString("userId")
             this.userId = userId
@@ -189,10 +191,6 @@ class UserFragment : Fragment() {
     }
 
     private fun configureViewUserState() {
-        var id =0
-        userId?.let {
-            id = it.toInt()
-        }
         viewModel.fetchUserLiveData.observe(viewLifecycleOwner) {
             handleUIState(it)
         }
@@ -220,7 +218,7 @@ class UserFragment : Fragment() {
         expiryDate.isEnabled = false
         paymentAmountView.isEnabled = false
         deleteButton.visibility = View.GONE
-        viewModel.fetchUserDetail(id)
+        viewModel.fetchUserDetail(userId ?: "")
         profileActionButton.text = "Update User"
     }
 
@@ -267,9 +265,8 @@ class UserFragment : Fragment() {
         }
 
         deleteButton.setOnClickListener {
-            val user = createUserFromField()
             isDeleteFlow = true
-            viewModel.deleteUser(user)
+            viewModel.deleteUser(userId ?: "")
         }
 
         profileActionButton.setOnClickListener {
@@ -299,7 +296,7 @@ class UserFragment : Fragment() {
         val id = userId?.toLong() ?: 0
         val amount = paymentAmountView.text.toString().toInt() ?: 0
         val paymentStatus = paymentStatusView.text.toString().lowercase() == "yes"
-        return User(id, profileNameView.text.toString(), profilePhoneView.text.toString(), profileWeightView.text.toString().toInt(), joiningDate.text.toString(), expiryDate.text.toString(), updatedUri?.toString() ?: currentUri?.toString() ?: "", profileAddressView.text.toString(), profileInjuryView.text.toString(), paymentStatus, profileGenderView.text.toString(), amount)
+        return User(id, profileNameView.text.toString(), profilePhoneView.text.toString(), profileWeightView.text.toString().toInt(), joiningDate.text.toString(), expiryDate.text.toString(), updatedUri?.toString() ?: currentUri?.toString() ?: "", profileAddressView.text.toString(), profileInjuryView.text.toString(), paymentStatus, profileGenderView.text.toString(), amount, true)
     }
 
     private fun<T> handleUIState(uiState: UIState<T>) {
