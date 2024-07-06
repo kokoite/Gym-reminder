@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun Todo() {
         /*
-        *
+        * isActive, Payment Amount in DB
         *
         */
     }

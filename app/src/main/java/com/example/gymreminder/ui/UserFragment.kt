@@ -10,6 +10,8 @@ import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.clearFragmentResultListener
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
@@ -26,6 +28,7 @@ import com.example.gymreminder.databinding.FragmentUserBinding
 import com.example.gymreminder.utility.getTodayDate
 import com.example.gymreminder.utility.hideKeyboard
 import com.google.android.material.textfield.TextInputEditText
+import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.util.Calendar
 
@@ -51,6 +54,10 @@ class UserFragment : Fragment() {
     private lateinit var deleteButton: Button
     private lateinit var separatorView: View
 
+    private var currentUri: Uri? = null
+    private var updatedUri: Uri? = null
+
+
     companion object {
         const val TAG = "GymApp"
     }
@@ -66,7 +73,19 @@ class UserFragment : Fragment() {
         setupViewModel()
         addFragmentResultListener()
         configureCurrentState()
+        handleBackPressed()
         return binding.root
+    }
+    
+    private fun handleBackPressed() {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner ,object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                updatedUri?.let {
+                    requireActivity().contentResolver.delete(it, null)
+                }
+                findNavController().popBackStack()
+            }
+        })
     }
 
     // Initializing all profile related views
@@ -97,24 +116,20 @@ class UserFragment : Fragment() {
         setFragmentResultListener("cameraFragment") { requestKey, bundle ->
             val photoUriString = bundle.getString("photoUri")
             if(photoUriString?.isNotEmpty() == true) {
-                photoUri?.let {
-                    requireContext().contentResolver.delete(it, null)
-                }
+                val photoUri = Uri.parse(photoUriString)
+                updatedUri = photoUri
+                updateProfileImage()
             }
-            val photoUri = Uri.parse(photoUriString)
-            this.photoUri = photoUri
-            updateProfileImage()
         }
 
         setFragmentResultListener("homeFragment") { requestKey, bundle ->
-            val currentState = bundle.getString("state")
-            currentState?.let {state ->
-                this.currentState = UserActions.valueOf(state)
-                Log.d(TAG, "addFragmentResultListener:$state ")
-            }
+            val currentState = bundle.getString("state") ?: ""
             val userId = bundle.getString("userId")
             this.userId = userId
-            configureCurrentState()
+            if(currentState.isNotEmpty() &&currentState != this.currentState.name) {
+                this.currentState = UserActions.valueOf(currentState)
+                configureCurrentState()
+            }
         }
     }
 
@@ -194,8 +209,14 @@ class UserFragment : Fragment() {
     }
 
     private fun updateUIForViewState(user: User) {
-        photoUri = Uri.parse(user.photo)
-        profileImage.setImageURI(Uri.parse(user.photo))
+        if(user.photo.isNotEmpty()) {
+            try {
+                currentUri = Uri.parse(user.photo)
+                profileImage.setImageURI(currentUri)
+            } catch (error: Exception) {
+                Log.d(TAG, "Unable to parse Uri")
+            }
+        }
         profileNameView.setText(user.name)
         profileGenderView.setText(user.gender.uppercase())
         profileInjuryView.setText(user.existingProblems)
@@ -217,15 +238,24 @@ class UserFragment : Fragment() {
                 id = it.toInt()
             }
         viewModel.updateUserLiveData.observe(viewLifecycleOwner) {
-            // TODO :- show toast message
-            Log.d(TAG, "configureUpdateUserState: $it")
+            Toast.makeText(requireContext(), "Deleted successfully", Toast.LENGTH_SHORT).show()
+            updatedUri?.let {
+                currentUri?.let {
+                    requireActivity().contentResolver.delete(it, null)
+                }
+            }
             findNavController().popBackStack()
         }
 
         viewModel.deleteUserLiveData.observe(viewLifecycleOwner) {
-            // TODO :- show toast message
-            Log.d(TAG, "configureUpdateUserState: $it")
-            // delete the image present at uri
+            Toast.makeText(requireContext(), "Deleted successfully", Toast.LENGTH_SHORT).show()
+            updatedUri?.let {
+                requireActivity().contentResolver.delete(it, null)
+            }
+
+            currentUri?.let {
+                requireActivity().contentResolver.delete(it, null)
+            }
             findNavController().popBackStack()
         }
 
@@ -257,13 +287,13 @@ class UserFragment : Fragment() {
 
 
     private fun updateProfileImage() {
-        profileImage.setImageURI(photoUri)
+        profileImage.setImageURI(updatedUri)
     }
 
     private fun createUserFromField(): User {
         val id = userId?.toLong() ?: 0
         val paymentStatus = paymentStatusView.text.toString().lowercase() == "yes"
-        return User(id, profileNameView.text.toString(), profilePhoneView.text.toString(), profileWeightView.text.toString().toInt(), joiningDate.text.toString(), expiryDate.text.toString(), photoUri?.toString() ?: "", profileAddressView.text.toString(), profileInjuryView.text.toString(), paymentStatus, profileGenderView.text.toString())
+        return User(id, profileNameView.text.toString(), profilePhoneView.text.toString(), profileWeightView.text.toString().toInt(), joiningDate.text.toString(), expiryDate.text.toString(), updatedUri?.toString() ?: "", profileAddressView.text.toString(), profileInjuryView.text.toString(), paymentStatus, profileGenderView.text.toString())
     }
 
     private fun handleLoading() {
@@ -272,5 +302,11 @@ class UserFragment : Fragment() {
 
     private fun handleError() {
 
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        currentUri = null
+        updatedUri = null
     }
 }

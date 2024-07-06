@@ -94,9 +94,6 @@ class HomeFragment : Fragment() {
         configureCreateUserButton()
         fetchUsers()
         requestPermission()
-        showBottomSheet()
-        val notificationService = NotificationService(requireContext().applicationContext)
-        notificationService.showNotification(20)
         return binding.root
     }
 
@@ -122,7 +119,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun checkPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        } else {
+            false
+        }
     }
 
     private fun showRationaleDialog() {

@@ -12,5 +12,10 @@ class MyApplication: Application() {
         super.onCreate()
         val notificationService = NotificationService(this)
         notificationService.createAndVerifyChannel()
+        scheduleWorkManager()
+    }
+
+    private fun scheduleWorkManager() {
+
     }
 }
