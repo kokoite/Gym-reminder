@@ -3,12 +3,17 @@ package com.example.gymreminder.utility
 import android.app.Activity
 import android.content.Context
 import android.graphics.PorterDuff
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.example.gymreminder.usecase.FilterUsersImpl
+import java.lang.IllegalArgumentException
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 
 fun Fragment.hideKeyboard() {
@@ -30,6 +35,17 @@ fun getTodayDate(): String {
     val month = calendar.get(Calendar.MONTH)
     val year = calendar.get(Calendar.YEAR)
     return "$day-${month+1}-$year"
+}
+
+fun convertToStringToMillis(curDate: String): Long {
+    val dateFormat = SimpleDateFormat("d-MM-yyyy", Locale.getDefault())
+    var timeInMilis: Long = 0
+    try {
+        timeInMilis = dateFormat.parse(curDate)?.time ?: throw IllegalArgumentException("Invalid format")
+    } catch (error: Error) {
+        Log.d(FilterUsersImpl.TAG, "convertToStringToMilis: Date format is wrong")
+    }
+    return timeInMilis
 }
 
 fun ImageView.setBackgroundTint(id: Int) {

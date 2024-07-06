@@ -16,7 +16,8 @@ data class User(
                 val address: String,
                 val existingProblems: String,
                 val paymentDone: Boolean,
-                val gender: String
+                val gender: String,
+                val amount: Int
 )
 
 

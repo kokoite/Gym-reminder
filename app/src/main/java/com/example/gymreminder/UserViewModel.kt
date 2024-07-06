@@ -7,9 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymreminder.data.User
 import com.example.gymreminder.data.UserDao
+import com.example.gymreminder.utility.convertToStringToMillis
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class UserViewModel(private val dao: UserDao) : ViewModel() {
 
@@ -53,6 +57,10 @@ class UserViewModel(private val dao: UserDao) : ViewModel() {
 
     fun createUser(user: User) {
         createUserJob?.cancel()
+        if(!shouldUpdateCreateUser(user)) {
+            _createUserLiveData.value = UIState.Error("Some fields are incomplete or invalid")
+            return
+        }
         _createUserLiveData.value = UIState.Loading
         createUserJob = viewModelScope.launch {
             try {
@@ -82,6 +90,10 @@ class UserViewModel(private val dao: UserDao) : ViewModel() {
     }
 
     fun updateUserDetail(user: User) {
+        if(!shouldUpdateCreateUser(user)) {
+            _updateUserLiveData.value = UIState.Error("Some fields are incomplete or invalid")
+            return
+        }
         updateUserJob?.cancel()
         _updateUserLiveData.value = UIState.Loading
         updateUserJob = viewModelScope.launch {
@@ -107,5 +119,20 @@ class UserViewModel(private val dao: UserDao) : ViewModel() {
                     UIState.Error("Something went wrong ${error.localizedMessage}")
             }
         }
+    }
+
+    private fun shouldUpdateCreateUser(user: User): Boolean {
+        if(user.name.isEmpty()
+            || user.phoneNumber.length < 10
+            || user.photo.isEmpty()
+            || user.address.isEmpty()
+            || user.existingProblems.isEmpty()
+            || user.expiryDate.isEmpty()
+            || user.gender.isEmpty()
+            || user.weight > 200
+            || convertToStringToMillis(user.joiningDate) > convertToStringToMillis(user.expiryDate)) {
+            return  false
+        }
+        return  true
     }
 }

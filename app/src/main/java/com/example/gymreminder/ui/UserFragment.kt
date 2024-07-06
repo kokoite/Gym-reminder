@@ -6,12 +6,16 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.View.OnFocusChangeListener
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.clearFragmentResultListener
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
@@ -53,6 +57,10 @@ class UserFragment : Fragment() {
     private lateinit var profilePhoneView: TextInputEditText
     private lateinit var deleteButton: Button
     private lateinit var separatorView: View
+    private lateinit var errorText: TextView
+    private lateinit var loader: ContentLoadingProgressBar
+    private lateinit var paymentAmountView: TextInputEditText
+    private var isDeleteFlow = false
 
     private var currentUri: Uri? = null
     private var updatedUri: Uri? = null
@@ -74,7 +82,17 @@ class UserFragment : Fragment() {
         addFragmentResultListener()
         configureCurrentState()
         handleBackPressed()
+        setupLoader()
+        setupErrorView()
         return binding.root
+    }
+
+    private fun setupErrorView() {
+        errorText = binding.errorText
+    }
+
+    private fun setupLoader() {
+        loader = binding.loader
     }
     
     private fun handleBackPressed() {
@@ -105,6 +123,7 @@ class UserFragment : Fragment() {
         profileActionButton = binding.createupdateUser
         deleteButton = binding.deleteUser
         separatorView = binding.userActionSeparatorView
+        paymentAmountView = binding.paymentAmount
     }
 
     private fun setupViewModel() {
@@ -134,6 +153,7 @@ class UserFragment : Fragment() {
     }
 
     private fun configureCurrentState() {
+        isDeleteFlow = false
         when (currentState) {
             UserActions.CREATE_USER -> configureCreateUserState()
             UserActions.EDIT_USER -> configureUpdateUserState()
@@ -143,7 +163,7 @@ class UserFragment : Fragment() {
 
     private fun configureCreateUserState() {
         viewModel.createUserLiveData.observe(viewLifecycleOwner) {
-            findNavController().popBackStack()
+            handleUIState(it)
         }
         profileActionButton.setOnClickListener {
             val user = createUserFromField()
@@ -162,6 +182,7 @@ class UserFragment : Fragment() {
         profileWeightView.isEnabled = true
         paymentStatusView.isEnabled = true
         expiryDate.isEnabled = true
+        paymentAmountView.isEnabled = true
         deleteButton.visibility = View.GONE
         separatorView.visibility = View.GONE
         profileActionButton.text = "Create User"
@@ -172,14 +193,8 @@ class UserFragment : Fragment() {
         userId?.let {
             id = it.toInt()
         }
-        Log.d(TAG, "configureViewUserState $id")
         viewModel.fetchUserLiveData.observe(viewLifecycleOwner) {
-            Log.d(TAG, "configureViewUserState: $it")
-            when(it) {
-                is UIState.Loading -> handleLoading()
-                is UIState.Success -> updateUIForViewState(it.result)
-                is UIState.Error -> handleError()
-            }
+            handleUIState(it)
         }
 
         profileActionButton.setOnClickListener {
@@ -203,6 +218,7 @@ class UserFragment : Fragment() {
         profileWeightView.isEnabled = false
         paymentStatusView.isEnabled = false
         expiryDate.isEnabled = false
+        paymentAmountView.isEnabled = false
         deleteButton.visibility = View.GONE
         viewModel.fetchUserDetail(id)
         profileActionButton.text = "Update User"
@@ -229,6 +245,7 @@ class UserFragment : Fragment() {
             "no"
         }
         paymentStatusView.setText(paymentStatus)
+        paymentAmountView.setText(user.amount.toString())
         expiryDate.setText(user.expiryDate)
     }
 
@@ -238,25 +255,11 @@ class UserFragment : Fragment() {
                 id = it.toInt()
             }
         viewModel.updateUserLiveData.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), "Deleted successfully", Toast.LENGTH_SHORT).show()
-            updatedUri?.let {
-                currentUri?.let {
-                    requireActivity().contentResolver.delete(it, null)
-                }
-            }
-            findNavController().popBackStack()
+            handleUIState(it)
         }
 
         viewModel.deleteUserLiveData.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), "Deleted successfully", Toast.LENGTH_SHORT).show()
-            updatedUri?.let {
-                requireActivity().contentResolver.delete(it, null)
-            }
-
-            currentUri?.let {
-                requireActivity().contentResolver.delete(it, null)
-            }
-            findNavController().popBackStack()
+            handleUIState(it)
         }
 
         profileImage.setOnClickListener {
@@ -265,6 +268,7 @@ class UserFragment : Fragment() {
 
         deleteButton.setOnClickListener {
             val user = createUserFromField()
+            isDeleteFlow = true
             viewModel.deleteUser(user)
         }
 
@@ -281,6 +285,7 @@ class UserFragment : Fragment() {
         profileWeightView.isEnabled = true
         paymentStatusView.isEnabled = true
         expiryDate.isEnabled = true
+        paymentAmountView.isEnabled = true
         separatorView.visibility = View.VISIBLE
         deleteButton.visibility = View.VISIBLE
     }
@@ -292,16 +297,66 @@ class UserFragment : Fragment() {
 
     private fun createUserFromField(): User {
         val id = userId?.toLong() ?: 0
+        val amount = paymentAmountView.text.toString().toInt() ?: 0
         val paymentStatus = paymentStatusView.text.toString().lowercase() == "yes"
-        return User(id, profileNameView.text.toString(), profilePhoneView.text.toString(), profileWeightView.text.toString().toInt(), joiningDate.text.toString(), expiryDate.text.toString(), updatedUri?.toString() ?: "", profileAddressView.text.toString(), profileInjuryView.text.toString(), paymentStatus, profileGenderView.text.toString())
+        return User(id, profileNameView.text.toString(), profilePhoneView.text.toString(), profileWeightView.text.toString().toInt(), joiningDate.text.toString(), expiryDate.text.toString(), updatedUri?.toString() ?: currentUri?.toString() ?: "", profileAddressView.text.toString(), profileInjuryView.text.toString(), paymentStatus, profileGenderView.text.toString(), amount)
+    }
+
+    private fun<T> handleUIState(uiState: UIState<T>) {
+        when(uiState) {
+            is UIState.Success<*> -> handleSuccess(uiState.result)
+            is UIState.Loading -> handleLoading()
+            is UIState.Error -> handleError(uiState.message)
+        }
+    }
+
+    private fun<T> handleSuccess(result: T) {
+        loader.hide()
+        if(isDeleteFlow) {
+            updatedUri?.let {
+                requireContext().contentResolver.delete(it, null)
+            }
+            currentUri?.let {
+                requireContext().contentResolver.delete(it, null)
+            }
+            Toast.makeText(requireContext(),"Deleted successfully", Toast.LENGTH_SHORT).show()
+            findNavController().popBackStack()
+            return
+        }
+        when (currentState) {
+            UserActions.CREATE_USER -> handleCreateUserResult()
+            UserActions.EDIT_USER -> handleUpdateUserResult()
+            UserActions.VIEW_USER -> handleViewUserResult(result as User)
+        }
+    }
+
+    private fun handleCreateUserResult() {
+        findNavController().popBackStack()
+    }
+
+    private fun handleUpdateUserResult() {
+        Toast.makeText(requireContext(), "Updated successfully", Toast.LENGTH_SHORT).show()
+        updatedUri?.let {
+            currentUri?.let {
+                requireContext().contentResolver.delete(it, null)
+            }
+        }
+        currentState = UserActions.VIEW_USER
+        configureCurrentState()
+    }
+
+    private fun handleViewUserResult(user: User) {
+        updateUIForViewState(user)
     }
 
     private fun handleLoading() {
-
+        loader.show()
     }
 
-    private fun handleError() {
-
+    private fun handleError(error: String) {
+        loader.hide()
+        errorText.text = error
+        errorText.visibility = VISIBLE
     }
 
     override fun onDestroyView() {

@@ -12,6 +12,16 @@
         android:padding="8dp"
         >
 
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/loader"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/addPhoto"
         android:layout_width="100dp"
@@ -279,9 +289,39 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Payment Done"
+                android:text="Payment Amount"
                 android:textSize="16sp"
 
+                />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/paymentAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="1000"
+                android:inputType="number"
+                android:maxLength="5"
+                android:maxLines="1"
+                android:paddingHorizontal="12dp"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/paymentStatusLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/weightLayout"
+            app:layout_constraintEnd_toStartOf="@id/paymentLayout"
+            app:layout_constraintStart_toEndOf="@id/weightLayout"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:gravity="center"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Payment Status"
+                android:textSize="16sp"
                 />
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/paymentStatus"
@@ -294,6 +334,7 @@
                 android:paddingHorizontal="12dp"
                 />
         </LinearLayout>
+
         <TextView
             android:id="@+id/errorText"
             android:layout_width="match_parent"
