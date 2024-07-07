@@ -21,6 +21,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.Exception
 import java.util.Date
 
 
@@ -31,6 +32,8 @@ class HomeViewModel(private val fetchAllUserUseCase: FetchAllUser,
     val listOfUser: LiveData<List<UserSummary>> get() = _mutableListOfUser
     private var filterName: Job? = null
     private var filterExpiry: Job? = null
+    private var filterActive: Job? = null
+    private var filterActiveWithExpiry: Job? = null
 
     fun fetchAllUser() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -44,6 +47,32 @@ class HomeViewModel(private val fetchAllUserUseCase: FetchAllUser,
         when(filterType) {
             is UserFilter.ExpireFilter -> handleExpiryFiltering(filterType.days)
             is UserFilter.NameFilter -> handleNameFiltering(filterType.name)
+            is UserFilter.ActiveFilter -> handleActiveFiltering(filterType.isActive)
+            is UserFilter.ActiveWithExpiry -> handleActiveWithExpiry()
+        }
+    }
+
+    private fun handleActiveFiltering(isActive: Boolean) {
+        filterActive?.cancel()
+        filterActive = viewModelScope.launch {
+            try {
+                val users = filterUserUseCase.filterUserBasedOnActive(isActive)
+                _mutableListOfUser.postValue(users)
+            } catch (error: Exception) {
+                Log.d(TAG, "handleActiveFiltering: Something went wrong ${error.localizedMessage}")
+            }
+        }
+    }
+
+    private fun handleActiveWithExpiry() {
+        filterActiveWithExpiry?.cancel()
+        filterActiveWithExpiry = viewModelScope.launch {
+            try {
+                val users = filterUserUseCase.filterActiveUserButExpiryPassed()
+                _mutableListOfUser.postValue(users)
+            } catch (error: Exception) {
+                Log.d(TAG, "handleActiveWithExpiry: Something went wrong ${error.localizedMessage}")
+            }
         }
     }
 
@@ -73,6 +102,8 @@ class HomeViewModel(private val fetchAllUserUseCase: FetchAllUser,
             }
         }
     }
+
+
 
 
     fun clearAllFilter() {

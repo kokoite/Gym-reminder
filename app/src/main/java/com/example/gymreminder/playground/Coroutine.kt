@@ -1,30 +1,24 @@
 package com.example.gymreminder.playground
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 suspend fun main() {
-    println("before coroutine scope")
-    coroutineScope {
-        println("before first coroutine")
-        delay(200)
-        println("after first coroutine")
-    }
-    println("between")
-    coroutineScope {
+    CoroutineScope(Dispatchers.IO).launch {
+        println("before")
+        delay(100)
+        println("after")
+    }.join()
 
-        launch(Dispatchers.IO) {
-            println("in launch")
-            delay(100)
-//            number += 2
-            println("with launch")
-        }.join()
-        println("without launch")
-    }
 
+    println("without")
 }
+
+
+
 
 
 suspend fun getNumber(): Int {

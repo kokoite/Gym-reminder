@@ -1,11 +1,15 @@
 package com.example.gymreminder
 
+import android.annotation.SuppressLint
 import android.app.Application
+import android.app.NotificationManager
 import android.content.Context
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import com.example.gymreminder.data.UserDao
 import com.example.gymreminder.data.UserDatabase
 import com.example.gymreminder.repository.UserDataSource
@@ -36,7 +40,6 @@ class MyApplication: Application() {
         const val TAG = "GymApp"
     }
 
-    // UseCases
     lateinit var filterUser: FilterUsers
     lateinit var createUser: CreateUser
     lateinit var deleteUser: DeleteUser
@@ -45,7 +48,7 @@ class MyApplication: Application() {
     lateinit var fetchUser: FetchUser
     lateinit var notificationService: NotificationService
     lateinit var repository: UserRepository
-    
+
 
     override fun onCreate() {
         super.onCreate()
@@ -68,13 +71,14 @@ class MyApplication: Application() {
         fetchUser = FetchUsersImpl(repository)
     }
 
+    @SuppressLint("InvalidPeriodicWorkRequestInterval")
     private fun scheduleWorkManager(context: Context) {
         // Calculate the initial delay to 4:00 AM
         val currentTime = Calendar.getInstance()
         val dueTime = Calendar.getInstance()
 
-        dueTime.set(Calendar.HOUR_OF_DAY, 4)
-        dueTime.set(Calendar.MINUTE, 0)
+        dueTime.set(Calendar.HOUR_OF_DAY, 12)
+        dueTime.set(Calendar.MINUTE, 32)
         dueTime.set(Calendar.SECOND, 0)
 
         if (dueTime.before(currentTime)) {
@@ -83,22 +87,7 @@ class MyApplication: Application() {
 
         val initialDelay = dueTime.timeInMillis - currentTime.timeInMillis
 
-        // Create the work request
-        val workRequest = PeriodicWorkRequestBuilder<NotificationWorker>(24, TimeUnit.HOURS)
-            .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiresBatteryNotLow(true)
-                    .setTriggerContentMaxDelay(Duration.ofMinutes(20*60*1000L))
-                    .build()
-            )
-            .build()
-
-        // Enqueue the work request
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            "Scheduling Notification",
-            ExistingPeriodicWorkPolicy.UPDATE,
-            workRequest
-        )
+        val workerRequest = PeriodicWorkRequest.Builder(NotificationWorker::class.java, 30,TimeUnit.SECONDS).build()
+        WorkManager.getInstance(this).enqueue(workerRequest)
     }
 }

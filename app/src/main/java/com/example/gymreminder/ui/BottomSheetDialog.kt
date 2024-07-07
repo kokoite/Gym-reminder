@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import com.example.gymreminder.R
 import com.example.gymreminder.databinding.BottomSheetDialogBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -14,7 +15,9 @@ class BottomSheetDialog(private val buttons: Array<BottomSheetButton>): BottomSh
     private lateinit var binding: BottomSheetDialogBinding
     private lateinit var expiry1: Button
     private lateinit var expiry2: Button
-    private lateinit var expiry3: Button
+    private lateinit var activeButton: Button
+    private lateinit var inactiveButton: Button
+    private lateinit var activeButExpiry: Button
     private lateinit var clearButton: Button
 
     // TODO :- can be changed to dynamic behaviour
@@ -32,7 +35,9 @@ class BottomSheetDialog(private val buttons: Array<BottomSheetButton>): BottomSh
     private fun setupButtons() {
         expiry1 = binding.expiry7
         expiry2 = binding.expiry15
-        expiry3 = binding.expiry30
+        activeButton = binding.activeButton
+        inactiveButton = binding.inactiveButton
+        activeButExpiry = binding.activeWithExpiry
         clearButton = binding.clearFilter
         expiry1.text = buttons[0].title
         expiry1.setOnClickListener {
@@ -44,14 +49,25 @@ class BottomSheetDialog(private val buttons: Array<BottomSheetButton>): BottomSh
             buttons[1].execute()
         }
 
-        expiry3.text = buttons[2].title
-        expiry3.setOnClickListener {
+        activeButton.text = buttons[2].title
+        activeButton.setOnClickListener {
             buttons[2].execute()
         }
 
-        clearButton.text = buttons[3].title
-        clearButton.setOnClickListener {
+        inactiveButton.text = buttons[3].title
+        inactiveButton.setOnClickListener {
             buttons[3].execute()
+        }
+
+        activeButExpiry.text = buttons[4].title
+        activeButExpiry.setOnClickListener {
+            buttons[4].execute()
+        }
+
+        clearButton.text = buttons[5].title
+        clearButton.setOnClickListener {
+            clearButton.setBackgroundColor(requireContext().getColor(R.color.blue))
+            buttons[5].execute()
         }
     }
 

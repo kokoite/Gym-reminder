@@ -149,7 +149,9 @@ class UserFragment : Fragment() {
             if(photoUriString?.isNotEmpty() == true) {
                 val photoUri = Uri.parse(photoUriString)
                 updatedUri = photoUri
-                updateProfileImage()
+                updateProfileImage(photoUri)
+            } else if(currentUri?.toString()?.isNotEmpty() == true) {
+                updateProfileImage(currentUri!!)
             }
         }
 
@@ -213,7 +215,7 @@ class UserFragment : Fragment() {
 
         profileImage.setOnClickListener {
             val bundle = Bundle().apply {
-                putString("photoUri", photoUri?.toString())
+                putString("photoUri", currentUri?.toString())
             }
             setFragmentResult("userFragment", bundle)
             findNavController().navigate(R.id.action_createUserFragment_to_previewImageFragment)
@@ -300,8 +302,8 @@ class UserFragment : Fragment() {
     }
 
 
-    private fun updateProfileImage() {
-        profileImage.setImageURI(updatedUri)
+    private fun updateProfileImage(uri: Uri) {
+        profileImage.setImageURI(uri)
     }
 
     private fun createUserFromField(): User {
@@ -376,7 +378,5 @@ class UserFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        currentUri = null
-        updatedUri = null
     }
 }

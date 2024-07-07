@@ -70,14 +70,14 @@ class FilterUsersImpl(private val repository: UserRepository): FilterUsers {
         }.await()
     }
 
-    override suspend fun filterUserBasedOnInactive(): List<UserSummary> {
+    override suspend fun filterUserBasedOnActive(isActive: Boolean): List<UserSummary> {
         return CoroutineScope(Dispatchers.IO).async {
             val subrange = createSubranges(5)
             subrange.map {
                 async {
                     val users = repository.fetchPaginatedUsersLocally(it.end-it.start,it.start)
                     withContext(Dispatchers.Default) {
-                        users.filter { !it.isActive  }
+                        users.filter { it.isActive == isActive  }
                     }.map {
                         UserSummary(it.userId, it.name, it.phoneNumber, it.joiningDate, it.expiryDate, it.photo)
                     }

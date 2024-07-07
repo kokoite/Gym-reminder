@@ -13,13 +13,16 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.ContextMenu
+import android.view.KeyEvent
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.View.INVISIBLE
 import android.view.View.OnFocusChangeListener
 import android.view.View.OnScrollChangeListener
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
@@ -28,6 +31,7 @@ import androidx.activity.result.registerForActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.setFragmentResult
 
 import androidx.lifecycle.ViewModelProvider
@@ -63,7 +67,7 @@ import kotlin.math.abs
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding: FragmentHomeBinding get() = _binding!!
-    private lateinit var searchView: androidx.appcompat.widget.SearchView
+    private lateinit var searchView: EditText
     private lateinit var  userListAdapter: UserListAdapter
     private lateinit var userListRecyclerView: RecyclerView
     private lateinit var createButton: FloatingActionButton
@@ -73,13 +77,15 @@ class HomeFragment : Fragment() {
     private lateinit var searchButton: ImageView
     private lateinit var filterButton: ImageView
     private var navigatingFromSettings = false
+    private val buttonActions: Array<BottomSheetDialog.BottomSheetButton> by lazy {
+        getButtonAction()
+    }
 
 
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {result ->
         if(result) {
             Log.d(TAG, "Permssion granted for post notification ")
         } else {
-            // show Denied permission dialog
             showPermissionDeniedDialog()
         }
     }
@@ -186,22 +192,55 @@ class HomeFragment : Fragment() {
     }
 
     private fun configureSearchView() {
-        searchView = binding.searchField
+        searchView = binding.searchView
+        closeButton = binding.closeIcon
+        filterButton = binding.filterIcon
+        searchButton = binding.searchIcon
         searchView.isFocusedByDefault = false
-        searchView.setOnQueryTextListener(object: androidx.appcompat.widget.SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                hideKeyboard()
-                viewModel.filterUser(UserFilter.NameFilter(query ?: ""))
-                return true
+        searchView.doOnTextChanged { text, _, _, _ ->
+            if(text?.isNotEmpty() == true) {
+                closeButton.visibility = View.VISIBLE
+                closeButton.setBackgroundTint(R.color.darkGray)
+                searchButton.setBackgroundTint(R.color.darkGray)
+                filterButton.setBackgroundTint(R.color.darkGray)
+                viewModel.filterUser(UserFilter.NameFilter(text.toString()))
+            } else {
+                closeButton.visibility = View.INVISIBLE
             }
+        }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                newText?.let {
-                    viewModel.filterUser(UserFilter.NameFilter(it))
-                }
-                return true
+        searchView.setOnEditorActionListener { _, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE ||
+                (event != null && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
+                hideKeyboard()
+                searchView.clearFocus()
+                Log.d(TAG, "configureSearchView: ${searchView.text}")
+                viewModel.filterUser(UserFilter.NameFilter(searchView.text.toString()))
+                closeButton.visibility = INVISIBLE
+                true
+            } else {
+                false
             }
-        })
+        }
+
+        closeButton.setOnClickListener {
+            searchView.setText("")
+            it.visibility = INVISIBLE
+            viewModel.filterUser(UserFilter.NameFilter(""))
+            searchButton.setBackgroundTint(R.color.lightGray)
+            filterButton.setBackgroundTint(R.color.lightGray)
+            closeButton.setBackgroundTint(R.color.lightGray)
+        }
+
+        filterButton.setOnClickListener {
+            showBottomSheet()
+        }
+
+        searchButton.setOnClickListener {
+            searchView.clearFocus()
+            closeButton.visibility = INVISIBLE
+            viewModel.filterUser(UserFilter.NameFilter(searchView.text.toString()))
+        }
     }
 
     private fun configureCreateUserButton() {
@@ -216,7 +255,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun showBottomSheet() {
-        val buttonActions = getButtonAction()
         dialog = BottomSheetDialog(buttonActions)
         dialog.show(childFragmentManager, "gymApp")
     }
@@ -225,8 +263,37 @@ class HomeFragment : Fragment() {
 
         val button1 = createBottomSheetButton(7)
         val button2 = createBottomSheetButton(15)
-        val button3 = createBottomSheetButton(30)
-        val button4 = object: BottomSheetDialog.BottomSheetButton {
+        val button4 = object : BottomSheetDialog.BottomSheetButton {
+            override val title: String
+                get() = "Active Users"
+
+            override fun execute() {
+                viewModel.filterUser(UserFilter.ActiveFilter(true))
+            }
+
+        }
+
+        val button5 = object : BottomSheetDialog.BottomSheetButton {
+            override val title: String
+                get() = "Inactive Users"
+
+            override fun execute() {
+                viewModel.filterUser(UserFilter.ActiveFilter(false))
+            }
+
+        }
+
+        val button6 = object : BottomSheetDialog.BottomSheetButton {
+            override val title: String
+                get() = "Active users, Plan expired"
+
+            override fun execute() {
+                viewModel.filterUser(UserFilter.ActiveWithExpiry())
+            }
+
+        }
+
+        val button7 = object: BottomSheetDialog.BottomSheetButton {
             override val title: String
                 get() = "Clear all filters"
 
@@ -236,7 +303,7 @@ class HomeFragment : Fragment() {
             }
         }
 
-        return listOf(button1, button2, button3, button4).toTypedArray()
+        return listOf(button1, button2, button4, button5, button6, button7).toTypedArray()
     }
 
     private fun createBottomSheetButton(days: Int) = object : BottomSheetDialog.BottomSheetButton {

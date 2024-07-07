@@ -41,9 +41,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun Todo() {
         /*
-          Adding isActive in userFragment
+        * Handling edge case for
         * Search View with filter
-        * Testing User Fragment
+        *
         */
     }
 }

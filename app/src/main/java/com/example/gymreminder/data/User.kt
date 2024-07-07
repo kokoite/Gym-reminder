@@ -51,6 +51,8 @@ enum class Gender(val description: String) {
 sealed class UserFilter {
     class ExpireFilter(val days: Int): UserFilter()
     class NameFilter(val name: String): UserFilter()
+    class ActiveFilter(val isActive: Boolean): UserFilter()
+    class ActiveWithExpiry(): UserFilter()
 }
 
 

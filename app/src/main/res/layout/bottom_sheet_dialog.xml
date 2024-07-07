@@ -46,11 +46,24 @@
 
     </LinearLayout>
 
+
+    <LinearLayout
+        android:id="@+id/activeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/expiryLayout"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        >
+
     <Button
-        android:id="@+id/expiry30"
+        android:id="@+id/activeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Expiry in 30 days"
+        android:text="Active users"
         android:textColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf ="@id/expiryLayout"
@@ -59,6 +72,52 @@
         android:backgroundTint="@color/black"
         />
 
+        <View
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            />
+
+
+    <Button
+        android:id="@+id/inactiveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Inactive Users"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf ="@id/expiryLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/black"
+        />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/activeExpiryLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activeLayout"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp" >
+
+    <Button
+        android:id="@+id/activeWithExpiry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Active users, Plan expired"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf ="@id/expiryLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/black"
+        />
+
+    </LinearLayout>
+
     <Button
         android:id="@+id/clearFilter"
         android:layout_width="wrap_content"
@@ -66,7 +125,7 @@
         android:text="Clear filter"
         android:textColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/expiry30"
+        app:layout_constraintTop_toBottomOf="@id/activeExpiryLayout"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp"
         android:backgroundTint="@color/black"
