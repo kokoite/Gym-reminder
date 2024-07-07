@@ -204,8 +204,9 @@ class HomeFragment : Fragment() {
                 searchButton.setBackgroundTint(R.color.darkGray)
                 filterButton.setBackgroundTint(R.color.darkGray)
                 viewModel.filterUser(UserFilter.NameFilter(text.toString()))
-            } else {
-                closeButton.visibility = View.INVISIBLE
+            } else if(text?.isEmpty() == true) {
+                viewModel.fetchAllUser()
+                closeButton.visibility = INVISIBLE
             }
         }
 
