@@ -14,6 +14,7 @@ import java.lang.IllegalArgumentException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.concurrent.locks.Condition
 
 
 fun Fragment.hideKeyboard() {
@@ -54,3 +55,10 @@ fun ImageView.setBackgroundTint(id: Int) {
         PorterDuff.Mode.MULTIPLY  // Apply the tint by multiplying with the original image colors
     )
 }
+const val milisecondInDay = 1000* 3600 * 24L
+
+data class Conditional<T>(val condition: Boolean, val result: T)
+
+infix fun <T> Boolean.then(result: T): Conditional<T> = Conditional(this, result)
+
+infix fun <T> Conditional<T>.otherwise(result: T): T = if (this.condition) this.result else result

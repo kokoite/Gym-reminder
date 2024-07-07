@@ -275,7 +275,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/paymentLayout"
+            android:id="@+id/paymentStatusLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="@id/weightLayout"
@@ -283,38 +283,8 @@
             app:layout_constraintStart_toEndOf="@id/weightLayout"
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
+            android:gravity="start"
             app:layout_constraintHorizontal_bias="1"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Payment Amount"
-                android:textSize="16sp"
-
-                />
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/paymentAmount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:hint="1000"
-                android:inputType="number"
-                android:maxLength="5"
-                android:maxLines="1"
-                android:paddingHorizontal="12dp"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/paymentStatusLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/weightLayout"
-            app:layout_constraintEnd_toStartOf="@id/paymentLayout"
-            app:layout_constraintStart_toEndOf="@id/weightLayout"
-            android:orientation="vertical"
-            android:paddingHorizontal="20dp"
-            android:gravity="center"
             >
 
             <TextView
@@ -335,19 +305,80 @@
                 />
         </LinearLayout>
 
+
+        <LinearLayout
+            android:id="@+id/isActiveLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/weightLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Active"
+                android:textSize="16sp"
+
+                />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/isActive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="Yes"
+                android:maxLines="1"
+                android:maxLength="3"
+                android:paddingHorizontal="12dp"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/paymentAmountLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/isActiveLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/isActiveLayout"
+            android:orientation="vertical"
+            app:layout_constraintHorizontal_bias="1"
+            android:paddingHorizontal="20dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Payment Amount"
+                android:textSize="16sp"
+
+                />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/paymentAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="date"
+                android:maxLines="1"
+                android:maxLength="4"
+                android:hint="1200"
+                android:paddingHorizontal="12dp"
+                />
+        </LinearLayout>
+
         <TextView
             android:id="@+id/errorText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/paymentLayout"
+            app:layout_constraintTop_toBottomOf="@id/paymentAmountLayout"
             android:maxLines="2"
             android:textColor="#F44336"
             android:textStyle="bold"
             android:textSize="24sp"
             android:paddingHorizontal="12dp"
-            android:visibility="invisible"
+            android:visibility="gone"
             android:text="Image not selected"
             />
 

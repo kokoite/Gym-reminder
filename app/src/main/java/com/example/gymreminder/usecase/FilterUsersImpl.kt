@@ -4,9 +4,9 @@ import android.util.Log
 import com.example.gymreminder.data.Subrange
 import com.example.gymreminder.data.UserDao
 import com.example.gymreminder.data.UserSummary
-import com.example.gymreminder.milisecondInDay
 import com.example.gymreminder.repository.UserRepository
 import com.example.gymreminder.utility.convertToStringToMillis
+import com.example.gymreminder.utility.milisecondInDay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -58,7 +58,8 @@ class FilterUsersImpl(private val repository: UserRepository): FilterUsers {
                         users.filter {
                             val expiryTime = convertToStringToMillis(it.expiryDate)
                             val currentTime = System.currentTimeMillis()
-                            (expiryTime <= currentTime + ((expiryDays+1) *  milisecondInDay))
+                            val joiningTime = convertToStringToMillis(it.joiningDate)
+                            ((expiryTime <= currentTime + ((expiryDays+1) *  milisecondInDay)) && (expiryTime > joiningTime) && (it.isActive))
 
                         }.map {
                             UserSummary(it.userId,it.name, it.phoneNumber, it.joiningDate, it.expiryDate, it.photo)

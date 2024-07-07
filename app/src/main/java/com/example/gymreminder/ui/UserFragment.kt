@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
+import android.view.View.INVISIBLE
 import android.view.View.OnFocusChangeListener
 import android.view.View.VISIBLE
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ import androidx.fragment.app.clearFragmentResultListener
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.gymreminder.MyApplication
 import com.example.gymreminder.R
@@ -33,7 +35,13 @@ import com.example.gymreminder.databinding.FragmentUserBinding
 import com.example.gymreminder.usecase.FetchUsersImpl
 import com.example.gymreminder.utility.getTodayDate
 import com.example.gymreminder.utility.hideKeyboard
+import com.example.gymreminder.utility.otherwise
+import com.example.gymreminder.utility.then
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.util.Calendar
@@ -62,6 +70,7 @@ class UserFragment : Fragment() {
     private lateinit var errorText: TextView
     private lateinit var loader: ContentLoadingProgressBar
     private lateinit var paymentAmountView: TextInputEditText
+    private lateinit var isActiveView: TextInputEditText
     private var isDeleteFlow = false
 
     private var currentUri: Uri? = null
@@ -126,6 +135,7 @@ class UserFragment : Fragment() {
         deleteButton = binding.deleteUser
         separatorView = binding.userActionSeparatorView
         paymentAmountView = binding.paymentAmount
+        isActiveView = binding.isActive
     }
 
     private fun setupViewModel() {
@@ -185,6 +195,7 @@ class UserFragment : Fragment() {
         paymentStatusView.isEnabled = true
         expiryDate.isEnabled = true
         paymentAmountView.isEnabled = true
+        isActiveView.isEnabled = true
         deleteButton.visibility = View.GONE
         separatorView.visibility = View.GONE
         profileActionButton.text = "Create User"
@@ -217,6 +228,7 @@ class UserFragment : Fragment() {
         paymentStatusView.isEnabled = false
         expiryDate.isEnabled = false
         paymentAmountView.isEnabled = false
+        isActiveView.isEnabled = false
         deleteButton.visibility = View.GONE
         viewModel.fetchUserDetail(userId ?: "")
         profileActionButton.text = "Update User"
@@ -245,13 +257,12 @@ class UserFragment : Fragment() {
         paymentStatusView.setText(paymentStatus)
         paymentAmountView.setText(user.amount.toString())
         expiryDate.setText(user.expiryDate)
+        val isActive = user.isActive then "Yes" otherwise "No"
+        isActiveView.setText(isActive)
     }
 
     private fun configureUpdateUserState() {
-            var id = 0
-            userId?.let {
-                id = it.toInt()
-            }
+
         viewModel.updateUserLiveData.observe(viewLifecycleOwner) {
             handleUIState(it)
         }
@@ -283,6 +294,7 @@ class UserFragment : Fragment() {
         paymentStatusView.isEnabled = true
         expiryDate.isEnabled = true
         paymentAmountView.isEnabled = true
+        isActiveView.isEnabled = true
         separatorView.visibility = View.VISIBLE
         deleteButton.visibility = View.VISIBLE
     }
@@ -317,6 +329,7 @@ class UserFragment : Fragment() {
                 requireContext().contentResolver.delete(it, null)
             }
             Toast.makeText(requireContext(),"Deleted successfully", Toast.LENGTH_SHORT).show()
+            isDeleteFlow = false
             findNavController().popBackStack()
             return
         }
@@ -338,8 +351,7 @@ class UserFragment : Fragment() {
                 requireContext().contentResolver.delete(it, null)
             }
         }
-        currentState = UserActions.VIEW_USER
-        configureCurrentState()
+        findNavController().popBackStack()
     }
 
     private fun handleViewUserResult(user: User) {
@@ -354,6 +366,12 @@ class UserFragment : Fragment() {
         loader.hide()
         errorText.text = error
         errorText.visibility = VISIBLE
+        lifecycleScope.launch(Dispatchers.Default) {
+            delay(100)
+            withContext(Dispatchers.Main) {
+                errorText.visibility = INVISIBLE
+            }
+        }
     }
 
     override fun onDestroyView() {

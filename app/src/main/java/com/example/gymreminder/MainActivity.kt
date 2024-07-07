@@ -37,13 +37,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding =   ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
     }
 
     private fun Todo() {
         /*
-        * validation
-        *
+          Adding isActive in userFragment
+        * Search View with filter
+        * Testing User Fragment
         */
     }
 }

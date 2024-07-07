@@ -24,7 +24,6 @@ import kotlinx.coroutines.withContext
 import java.util.Date
 
 
-const val milisecondInDay = 1000* 3600 * 24L
 class HomeViewModel(private val fetchAllUserUseCase: FetchAllUser,
                     private val filterUserUseCase: FilterUsers
                     ): ViewModel() {
@@ -77,6 +76,6 @@ class HomeViewModel(private val fetchAllUserUseCase: FetchAllUser,
 
 
     fun clearAllFilter() {
-
+        fetchAllUser()
     }
 }
